@@ -1,7 +1,8 @@
 /*
  *  Copyright (C) 2007 Austin Robot Technology, Patrick Beeson
  *  Copyright (C) 2009-2012 Austin Robot Technology, Jack O'Quin
- * 
+ *  Copyright (C) 2016 University of Freiburg
+ *
  *  License: Modified BSD Software License Agreement
  *
  *  $Id$
@@ -114,7 +115,7 @@ bool VelodyneDriver::publishPacket(void)
     output_.publish(packet);
     uint32_t packet_time = getPacketTime(packet);
     if (previous_pkt_time > packet_time) 
-      ROS_WARN("The timestamp of packet is smaller than previous packet timestamp.");
+      ROS_WARN("The timestamp of packet is smaller than previous packet timestamp. This should happen only once per hour (velodyne time reset).");
     previous_pkt_time = packet_time;
   }
 

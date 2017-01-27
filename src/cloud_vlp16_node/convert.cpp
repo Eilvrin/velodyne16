@@ -36,7 +36,7 @@
 
     // subscribe to Velodyne packets
     velodyne_packet_ =
-      node.subscribe("velodyne16/packets", 10,
+      node.subscribe("velodyne16/packets", 100,
                      &Convert::processPackets, (Convert *) this,
                      ros::TransportHints().tcpNoDelay(true));
   }
@@ -45,8 +45,7 @@
                         uint32_t level)
   {
   ROS_INFO("Reconfigure request.");
-  data_->setParameters(config.min_range, config.max_range, config.view_direction,
-                       config.view_width);
+  data_->setParameters(config.min_range, config.max_range);
   }
 
   /** @brief Callback for raw packet messages. */
@@ -55,21 +54,5 @@
     if (output_.getNumSubscribers() == 0)         // no one listening?
       return;                                     // avoid much work
 
-    // allocate a point cloud 
-    velodyne16_rawdata::VPointCloud::Ptr outMsg(new velodyne16_rawdata::VPointCloud());
-    velodyne16_rawdata::VPointCloud::Ptr outMsg2(new velodyne_rawdata::VPointCloud());
-
-    // process all packets provided by the driver
-    //data_->unpack(scanMsg, *outMsg);
-    std::cout<<"Process packet" << std::endl;
-
-    // publish the cloud message
-    ROS_DEBUG_STREAM("Publishing " << outMsg->height << " x " << outMsg->width
-                     << " Velodyne points, time: " << outMsg->header.stamp);
-    output_.publish(outMsg);
-
-    // publish the cloud message
-    ROS_DEBUG_STREAM("Publishing " << outMsg2->height << " x " << outMsg2->width
-                     << " Velodyne points, time: " << outMsg2->header.stamp);
-    output2_.publish(outMsg2);
+    data_->unpack_vlp16(packetMsg, output_, output2_);
   }

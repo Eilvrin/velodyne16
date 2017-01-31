@@ -32,7 +32,7 @@ namespace velodyne16_rawdata
   ////////////////////////////////////////////////////////////////////////
 
   RawData::RawData()
-      : tf_listener_(NULL), prev_asymuth_strongest_(-1), prev_asymuth_last_(-1), prev_pkt_time_(0), timestamp_strongest_(0), timestamp_last_(0)
+      : tf_listener_(NULL), prev_asymuth_strongest_(-1), prev_asymuth_last_(-1), prev_pkt_time_(0), timestamp_strongest_(0), timestamp_last_(0), prev_pkt_seq_(-1)
   {
   }
 
@@ -105,9 +105,15 @@ namespace velodyne16_rawdata
   {
     // Check sequence of packages
     ros::Time pkt_time = packetMsg->header.stamp;
+    // Check sequence id of packages
+    int pkt_seq = packetMsg->header.seq;
     if (prev_pkt_time_ > pkt_time)
       ROS_WARN("The timestamp of packet is smaller than the previous packet timestamp.");
     prev_pkt_time_ = pkt_time;
+
+    if (pkt_seq - prev_pkt_seq_ != 1 && prev_pkt_seq_ != -1)
+      ROS_WARN("The sequence of packet is not different by 1. prev_pkt_seq: %i, pkt_seq: %i", prev_pkt_seq_, pkt_seq);
+    prev_pkt_seq_ = pkt_seq;
 
     float azimuth;
     float azimuth_diff; // azimuth(N+2)-azimuth(N) with N ... number of firing in packet
@@ -143,6 +149,10 @@ namespace velodyne16_rawdata
 
     // Process each block.
     for (int block = 0; block < BLOCKS_PER_PACKET; block++) {
+
+      // Reset previous last points
+      if (dual_return && (block % 2 == 0)) std::fill(prev_last_.begin(), prev_last_.end(), nan_point); 
+
       // Sanity check: ignore packets with mangled or otherwise different contents.
       if (UPPER_BANK != raw->blocks[block].header) {
         // Do not flood the log with messages, only issue at most one
@@ -165,12 +175,9 @@ namespace velodyne16_rawdata
         continue;
       }
 
-      // Reset previous last points
-      if (dual_return && (block % 2 == 0)) std::fill(prev_last_.begin(), prev_last_.end(), nan_point); 
-
       // Calculate difference between current and next block's azimuth angle.
       azimuth = (float)(raw->blocks[block].rotation);
-      if (block < (BLOCKS_PER_PACKET-i_diff)){
+      if (block < (BLOCKS_PER_PACKET-i_diff) && UPPER_BANK == raw->blocks[block+i_diff].header){
         azimuth_diff = (float)((36000 + raw->blocks[block+i_diff].rotation
                                - raw->blocks[block].rotation)%36000);
         last_azimuth_diff = azimuth_diff;
@@ -398,7 +405,7 @@ namespace velodyne16_rawdata
             if (dual_return && (block % 2 != 0)) // Strongest
             {
               VPoint prev_last_point = prev_last_[VLP16_SCANS_PER_FIRING*firing+row];
-              if ((prev_last_point.x - x_coord < 0.001) && (prev_last_point.y - y_coord < 0.001) && (prev_last_point.z - z_coord < 0.001))
+              if ((prev_last_point.x - x_coord < STRONGEST_TRESH_) && (prev_last_point.y - y_coord < STRONGEST_TRESH_) && (prev_last_point.z - z_coord < STRONGEST_TRESH_))
               {
                 points_strongest_[row].push_back(point); // Nan point
               } else {

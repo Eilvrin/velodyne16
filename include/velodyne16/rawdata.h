@@ -65,6 +65,9 @@ namespace velodyne16_rawdata
   static const float  VLP16_DSR_TOFFSET       =   2.304f;   // [µs]
   static const float  VLP16_FIRING_TOFFSET    =  55.296f;   // [µs]
 
+  /** Treshold for strongest return. */
+  static const double STRONGEST_TRESH_ = 0.001;
+
   /** \brief Raw Velodyne data block.
    *
    *  Each block contains data from either the upper or lower laser
@@ -158,6 +161,7 @@ namespace velodyne16_rawdata
     std::ofstream file_;
 
     ros::Time prev_pkt_time_; // previous timestamp
+    int prev_pkt_seq_;
 
     float prev_asymuth_strongest_; // previous asymuth for strongest return
     float prev_asymuth_last_; // previous asymuth for last return

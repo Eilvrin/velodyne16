@@ -36,7 +36,7 @@
 
     // subscribe to Velodyne packets
     velodyne_packet_ =
-      node.subscribe("velodyne16/packets", 100,
+      node.subscribe("velodyne16/packets", 2000,
                      &Convert::processPackets, (Convert *) this,
                      ros::TransportHints().tcpNoDelay(true));
   }
@@ -51,8 +51,8 @@
   /** @brief Callback for raw packet messages. */
   void Convert::processPackets(const velodyne16::VelodynePacket::ConstPtr &packetMsg)
   {
-    if (output_.getNumSubscribers() == 0)         // no one listening?
-      return;                                     // avoid much work
+    // if (output_.getNumSubscribers() == 0)         // no one listening?
+    //   return;                                     // avoid much work
 
     data_->unpack_vlp16(packetMsg, output_, output2_);
   }

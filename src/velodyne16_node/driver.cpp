@@ -86,7 +86,7 @@ VelodyneDriver::VelodyneDriver(ros::NodeHandle node,
 
   // raw packet output topic
   output_ =
-    node.advertise<velodyne16::VelodynePacket>("velodyne16/packets", 2000);
+    node.advertise<velodyne16::VelodynePacket>("velodyne16/packets", 100);
 
   previous_pkt_time = 0;
 

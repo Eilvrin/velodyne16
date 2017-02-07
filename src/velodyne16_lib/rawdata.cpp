@@ -39,23 +39,21 @@ namespace velodyne16_rawdata
   /** Update parameters: conversions and update */
   void RawData::setParameters(double min_range,
                               double max_range,
-                              const std::string& frame_id,
+                              bool velodyne_static,
                               const std::string& fixed_frame_id)
   {
     config_.min_range = min_range;
     config_.max_range = max_range;
+    config_.velodyne_static = velodyne_static;
 
     // Fixed frame id
-    const std::string last_fixed_frame_id = config_.fixed_frame_id;
-    config_.fixed_frame_id = fixed_frame_id;
-    if (!config_.fixed_frame_id.empty() && config_.fixed_frame_id != last_fixed_frame_id)
+    if (!config_.velodyne_static)
+    {
+      const std::string last_fixed_frame_id = config_.fixed_frame_id;
+      config_.fixed_frame_id = fixed_frame_id;
+      if (config_.fixed_frame_id != last_fixed_frame_id)
         ROS_INFO_STREAM("Fixed frame: " << config_.fixed_frame_id);
-
-    // Read new target coordinate frame.
-    const std::string last_frame_id = config_.frame_id;
-    config_.frame_id = frame_id;
-    if (!config_.frame_id.empty() && config_.frame_id != last_frame_id)
-        ROS_INFO_STREAM("Target frame: " << config_.frame_id);
+    }
   }
 
 
@@ -226,10 +224,8 @@ namespace velodyne16_rawdata
               strongest.publish(outMsgStrongest);
 
               // Set the header data for next pointcloud.
-              if (tf_listener_ == NULL || config_.frame_id.empty())
-                frame_id_ = packetMsg->header.frame_id;
-              else
-                frame_id_ = config_.frame_id;
+              frame_id_ = packetMsg->header.frame_id;
+
               timestamp_strongest_ = packetMsg->header.stamp + ros::Duration((block*VLP16_BLOCK_TDURATION+t_beam)*1.0e-6);
 
               points_strongest_.clear();
@@ -266,10 +262,8 @@ namespace velodyne16_rawdata
               last.publish(outMsgLast);
 
               // Set the header data for next pointcloud.
-              if (tf_listener_ == NULL || config_.frame_id.empty())
-                frame_id_ = packetMsg->header.frame_id;
-              else
-                frame_id_ = config_.frame_id;
+              frame_id_ = packetMsg->header.frame_id;
+ 
               timestamp_last_ = packetMsg->header.stamp + ros::Duration((block*VLP16_BLOCK_TDURATION+t_beam)*1.0e-6);    
 
               points_last_.clear();
@@ -401,7 +395,7 @@ namespace velodyne16_rawdata
            continue;
           }
 
-          if (tf_listener_ == NULL || config_.frame_id.empty()) {
+          if (config_.velodyne_static) {
             if (dual_return && (block % 2 != 0)) // Strongest
             {
               VPoint prev_last_point = prev_last_[VLP16_SCANS_PER_FIRING*firing+row];

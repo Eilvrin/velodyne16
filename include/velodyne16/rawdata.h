@@ -125,7 +125,7 @@ namespace velodyne16_rawdata
      */
     int setup(ros::NodeHandle private_nh, tf::TransformListener* tf_listener = NULL);
 
-    void setParameters(double min_range, double max_range, const std::string& frame_id = "", const std::string& fixed_frame_id = "");
+    void setParameters(double min_range, double max_range, bool velodyne_static, const std::string& fixed_frame_id = "");
 
     /** @brief convert raw Velodyne packets to point cloud
      *
@@ -140,7 +140,7 @@ namespace velodyne16_rawdata
       std::string calibrationFile;     ///< calibration file name
       double max_range;                ///< maximum range to publish
       double min_range;                ///< minimum range to publish
-      std::string frame_id;            ///< frame into which to transform points
+      bool velodyne_static;            ///< Whether or not to usee tf, if True do not use tf
       std::string fixed_frame_id;     ///<  fixed frame for tf transform
     } Config;
     Config config_;
@@ -172,7 +172,7 @@ namespace velodyne16_rawdata
     std::vector< std::vector<VPoint> > points_last_;
     std::vector< std::vector<VPoint> > points_strongest_;
 
-    std::vector<VPoint> prev_last_; // Points to compare to strongest in order to set similar points to NAN
+    std::vector<VPoint> prev_last_; // Points to compare to strongest return in order to set similar points to NAN
 
     /** in-line test whether a point is in range */
     bool pointInRange(float range)

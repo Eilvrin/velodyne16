@@ -36,7 +36,7 @@
 
     // subscribe to Velodyne packets
     velodyne_packet_ =
-      node.subscribe("velodyne16/packets", 2000,
+      node.subscribe("velodyne16/packets", 100,
                      &Convert::processPackets, (Convert *) this,
                      ros::TransportHints().tcpNoDelay(true));
   }
@@ -45,14 +45,11 @@
                         uint32_t level)
   {
   ROS_INFO("Reconfigure request.");
-  data_->setParameters(config.min_range, config.max_range);
+  data_->setParameters(config.min_range, config.max_range, config.velodyne_static, config.fixed_frame_id);
   }
 
   /** @brief Callback for raw packet messages. */
   void Convert::processPackets(const velodyne16::VelodynePacket::ConstPtr &packetMsg)
   {
-    // if (output_.getNumSubscribers() == 0)         // no one listening?
-    //   return;                                     // avoid much work
-
     data_->unpack_vlp16(packetMsg, output_, output2_);
   }

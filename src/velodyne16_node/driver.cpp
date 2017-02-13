@@ -31,12 +31,15 @@ VelodyneDriver::VelodyneDriver(ros::NodeHandle node,
     {
       ROS_INFO_STREAM("Only accepting packets from IP address: "
                       << devip_str_);
-      devip_.s_addr = inet_addr(devip_str_.c_str());
-      if (devip_.s_addr == -1) 
+      int address;
+      address = inet_addr(devip_str_.c_str());
+      if (address == -1) 
         {
         ROS_ERROR_STREAM ("Error in IP adress: " << devip_str_);
         node.shutdown();
         exit(EXIT_FAILURE);
+      } else {
+        devip_.s_addr = address;
       }
     }  
 
@@ -79,7 +82,7 @@ VelodyneDriver::VelodyneDriver(ros::NodeHandle node,
   // Initialize dynamic reconfigure
   srv_ = boost::make_shared <dynamic_reconfigure::Server<velodyne16::
     Velodyne16NodeConfig> > (private_nh);
-  dynamic_reconfigure::Server<velodyne16::Velodyne16NodeConfig>::
+  dynamic_reconfigure::Server<velodyne16::Veloppdyne16NodeConfig>::
     CallbackType f;
   f = boost::bind (&VelodyneDriver::callback, this, _1, _2);
   srv_->setCallback (f); // Set callback function und call initially

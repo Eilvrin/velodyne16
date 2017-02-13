@@ -19,7 +19,7 @@
   Convert::Convert(ros::NodeHandle node, ros::NodeHandle private_nh):
     data_(new velodyne16_rawdata::RawData())
   {
-    data_->setup(private_nh);
+    data_->setup(private_nh, &listener_);
 
     // advertise output point cloud (before subscribing to input data)
     output_ =
@@ -35,10 +35,15 @@
     srv_->setCallback (f);
 
     // subscribe to Velodyne packets
-    velodyne_packet_ =
-      node.subscribe("velodyne16/packets", 100,
-                     &Convert::processPackets, (Convert *) this,
-                     ros::TransportHints().tcpNoDelay(true));
+    // velodyne_packet_ =
+    //   node.subscribe("velodyne16/packets", 100,
+    //                  &Convert::processPackets, (Convert *) this,
+    //                  ros::TransportHints().tcpNoDelay(true));
+
+    velodyne_packet_.subscribe(node, "velodyne16/packets", 1000);
+    tf_filter_ = new tf::MessageFilter<velodyne16::VelodynePacket>(velodyne_packet_, listener_, "velodyne16", 1000);
+    tf_filter_->registerCallback(boost::bind(&Convert::processPackets, this, _1));
+
   }
 
   void Convert::callback(velodyne16::CloudVLP16NodeConfig &config,

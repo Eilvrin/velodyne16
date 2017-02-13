@@ -390,35 +390,72 @@ namespace velodyne16_rawdata
           {
             if (dual_return && (block % 2 != 0)) // Strongest
               points_strongest_[row].push_back(point);
-           else                                  // Last
+            else                                 // Last
               points_last_[row].push_back(point);
-           continue;
+
+            continue;
           }
 
-          if (config_.velodyne_static) {
-            if (dual_return && (block % 2 != 0)) // Strongest
-            {
-              VPoint prev_last_point = prev_last_[VLP16_SCANS_PER_FIRING*firing+row];
-              if ((prev_last_point.x - x_coord < STRONGEST_TRESH_) && (prev_last_point.y - y_coord < STRONGEST_TRESH_) && (prev_last_point.z - z_coord < STRONGEST_TRESH_))
-              {
-                points_strongest_[row].push_back(point); // Nan point
-              } else {
-                point.x         = x_coord;
-                point.y         = y_coord;
-                point.z         = z_coord;
-                point.intensity = (uint8_t)intensity;
-                points_strongest_[row].push_back(point);
-              }
-              continue;
-            }else { // Last
+          if (dual_return && (block % 2 != 0))
+          {
+            //Strongest return, check the point and leave it nan if it is close to last point
+            VPoint prev_last_point = prev_last_[VLP16_SCANS_PER_FIRING*firing+row];
+            if (!(std::fabs(prev_last_point.x - x_coord) < STRONGEST_TRESH_) && 
+                !(std::fabs(prev_last_point.y - y_coord) < STRONGEST_TRESH_) && 
+                !(std::fabs(prev_last_point.z - z_coord) < STRONGEST_TRESH_)){
               point.x         = x_coord;
               point.y         = y_coord;
               point.z         = z_coord;
               point.intensity = (uint8_t)intensity;
-              points_last_[row].push_back(point);
-              if (dual_return) prev_last_[VLP16_SCANS_PER_FIRING*firing+row] = point;
-              continue;
             }
+          } else {
+            // Last return
+            point.x         = x_coord;
+            point.y         = y_coord;
+            point.z         = z_coord;
+            point.intensity = (uint8_t)intensity;
+            if (dual_return) prev_last_[VLP16_SCANS_PER_FIRING*firing+row] = point;
+          }
+
+          if (config_.velodyne_static) {
+            // No tf transform, push points without transform
+            if (dual_return && (block % 2 != 0))
+              points_strongest_[row].push_back(point);
+            else
+              points_last_[row].push_back(point);
+          } else {
+            // Use tf transform, transform every single point
+            // from sensor frame to target frame.
+            geometry_msgs::PointStamped t_point;
+            t_point.header.frame_id = frame_id_;
+            t_point.header.stamp =  packetMsg->header.stamp + ros::Duration((block*VLP16_BLOCK_TDURATION+t_beam)*1.0e-6);
+            t_point.point.x         = point.x;
+            t_point.point.y         = point.y;
+            t_point.point.z         = point.z;
+
+            ros::Time target_time;
+            if (dual_return && (block % 2 != 0))
+              target_time = timestamp_strongest_;
+            else
+              target_time = timestamp_last_;
+
+            try {
+              tf_listener_->transformPoint(frame_id_, target_time, t_point, config_.fixed_frame_id, t_point);
+            } catch (std::exception& ex) {
+              // only log tf error once every second
+              ROS_WARN_THROTTLE(LOG_PERIOD_, "%s", ex.what());
+              continue;                   // skip this point
+            }
+
+            point.x         = t_point.point.x;
+            point.y         = t_point.point.y;
+            point.z         = t_point.point.z;
+            point.intensity = (uint8_t)intensity;
+
+            if (dual_return && (block % 2 != 0))
+              points_strongest_[row].push_back(point);
+            else
+              points_last_[row].push_back(point);
           }
         } // Iterate over beams
       } // Iterate over firings

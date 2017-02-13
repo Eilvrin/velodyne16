@@ -26,6 +26,9 @@
 #include <velodyne16/rawdata.h>
 #include <velodyne16/CloudVLP16NodeConfig.h>
 
+#include "tf/message_filter.h"
+#include "message_filters/subscriber.h"
+
 
 class Convert
 {
@@ -45,9 +48,13 @@ private:
     CloudVLP16NodeConfig> > srv_;
     
   boost::shared_ptr<velodyne16_rawdata::RawData> data_;
-  ros::Subscriber velodyne_packet_;
+  //ros::Subscriber velodyne_packet_;
   ros::Publisher output_;
   ros::Publisher output2_;
+  tf::TransformListener listener_;
+
+  message_filters::Subscriber<velodyne16::VelodynePacket> velodyne_packet_;
+  tf::MessageFilter<velodyne16::VelodynePacket> *tf_filter_;
   
 };
 

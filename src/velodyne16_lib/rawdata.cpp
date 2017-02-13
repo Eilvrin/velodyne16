@@ -440,17 +440,27 @@ namespace velodyne16_rawdata
               target_time = timestamp_last_;
 
             try {
-              tf_listener_->transformPoint(frame_id_, target_time, t_point, config_.fixed_frame_id, t_point);
+              if (tf_listener_->waitForTransform(frame_id_,target_time,
+                                frame_id_, t_point.header.stamp,
+                                config_.fixed_frame_id, ros::Duration(1.0)))              
+                  {
+                    tf_listener_->transformPoint(frame_id_, target_time, t_point, config_.fixed_frame_id, t_point);
+                    point.x         = t_point.point.x;
+                    point.y         = t_point.point.y;
+                    point.z         = t_point.point.z;
+                    point.intensity = (uint8_t)intensity;
+                  }
+                  else
+                  {
+                    point.x = point.y = point.z = std::numeric_limits<float>::quiet_NaN();
+                    point.intensity = 0u;
+                  }
             } catch (std::exception& ex) {
               // only log tf error once every second
               ROS_WARN_THROTTLE(LOG_PERIOD_, "%s", ex.what());
-              continue;                   // skip this point
+              point.x = point.y = point.z = std::numeric_limits<float>::quiet_NaN();
+              point.intensity = 0u;
             }
-
-            point.x         = t_point.point.x;
-            point.y         = t_point.point.y;
-            point.z         = t_point.point.z;
-            point.intensity = (uint8_t)intensity;
 
             if (dual_return && (block % 2 != 0))
               points_strongest_[row].push_back(point);

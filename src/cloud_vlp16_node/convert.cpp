@@ -34,15 +34,15 @@
     f = boost::bind (&Convert::callback, this, _1, _2);
     srv_->setCallback (f);
 
-    // subscribe to Velodyne packets
-    // velodyne_packet_ =
-    //   node.subscribe("velodyne16/packets", 100,
-    //                  &Convert::processPackets, (Convert *) this,
-    //                  ros::TransportHints().tcpNoDelay(true));
+    //subscribe to Velodyne packets
+    velodyne_packet_ =
+      node.subscribe("velodyne16/packets", 1000,
+                     &Convert::processPackets, (Convert *) this,
+                     ros::TransportHints().tcpNoDelay(true));
 
-    velodyne_packet_.subscribe(node, "velodyne16/packets", 1000);
-    tf_filter_ = new tf::MessageFilter<velodyne16::VelodynePacket>(velodyne_packet_, listener_, "velodyne16", 1000);
-    tf_filter_->registerCallback(boost::bind(&Convert::processPackets, this, _1));
+    // velodyne_packet_.subscribe(node, "velodyne16/packets", 1000);
+    // tf_filter_ = new tf::MessageFilter<velodyne16::VelodynePacket>(velodyne_packet_, listener_, "velodyne16", 1000);
+    // tf_filter_->registerCallback(boost::bind(&Convert::processPackets, this, _1));
 
   }
 

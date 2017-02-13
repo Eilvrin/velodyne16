@@ -82,7 +82,7 @@ VelodyneDriver::VelodyneDriver(ros::NodeHandle node,
   // Initialize dynamic reconfigure
   srv_ = boost::make_shared <dynamic_reconfigure::Server<velodyne16::
     Velodyne16NodeConfig> > (private_nh);
-  dynamic_reconfigure::Server<velodyne16::Veloppdyne16NodeConfig>::
+  dynamic_reconfigure::Server<velodyne16::Velodyne16NodeConfig>::
     CallbackType f;
   f = boost::bind (&VelodyneDriver::callback, this, _1, _2);
   srv_->setCallback (f); // Set callback function und call initially

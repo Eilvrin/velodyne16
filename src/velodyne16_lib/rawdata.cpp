@@ -440,9 +440,18 @@ namespace velodyne16_rawdata
               target_time = timestamp_last_;
 
             try {
+
+              // Set wait for transform duration: Wait 1s, but only every 5 seconds
+              static ros::Time last_wait_for_tf = ros::Time(0.0);
+              ros::Duration wait_for_tf_duration = ros::Duration(0.0);
+              const ros::Time time_before_tf = ros::Time::now();
+              if ((time_before_tf - last_wait_for_tf).toSec() > 5.0) {
+                wait_for_tf_duration = WAIT_FOR_TF_DURATION_DEFAULT_;
+              }
+
               if (tf_listener_->waitForTransform(frame_id_,target_time,
                                 frame_id_, t_point.header.stamp,
-                                config_.fixed_frame_id, ros::Duration(1.0)))              
+                                config_.fixed_frame_id, wait_for_tf_duration))              
                   {
                     tf_listener_->transformPoint(frame_id_, target_time, t_point, config_.fixed_frame_id, t_point);
                     point.x         = t_point.point.x;
@@ -452,8 +461,15 @@ namespace velodyne16_rawdata
                   }
                   else
                   {
+                    // Set point to Nan and warn
                     point.x = point.y = point.z = std::numeric_limits<float>::quiet_NaN();
                     point.intensity = 0u;
+                    ROS_WARN_THROTTLE(LOG_PERIOD_, "Could not find a valid transform from frame %s to frame %s via fixed frame %s.", frame_id_.c_str(), frame_id_.c_str(), config_.fixed_frame_id.c_str());
+
+                    // Remember last wait for transform time
+                    if (wait_for_tf_duration == WAIT_FOR_TF_DURATION_DEFAULT_) {
+                      last_wait_for_tf = time_before_tf;
+                    }
                   }
             } catch (std::exception& ex) {
               // only log tf error once every second

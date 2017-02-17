@@ -67,6 +67,7 @@ namespace velodyne16_rawdata
 
   /** Treshold for strongest return. */
   static const double STRONGEST_TRESH_ = 0.001;
+  static const ros::Duration WAIT_FOR_TF_DURATION_DEFAULT_ = ros::Duration(1.0);
 
   /** \brief Raw Velodyne data block.
    *

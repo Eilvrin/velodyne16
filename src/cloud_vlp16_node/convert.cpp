@@ -56,5 +56,7 @@
   /** @brief Callback for raw packet messages. */
   void Convert::processPackets(const velodyne16::VelodynePacket::ConstPtr &packetMsg)
   {
+    //std::cout << "Process packet" << std::endl;
     data_->unpack_vlp16(packetMsg, output_, output2_);
+   // std::cout << "Finish packet" << std::endl;
   }

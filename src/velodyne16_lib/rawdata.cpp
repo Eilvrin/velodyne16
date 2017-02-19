@@ -22,6 +22,8 @@
  */
 
 #include <velodyne16/rawdata.h>
+#include <chrono>
+using namespace std::chrono;
 
 namespace velodyne16_rawdata
 {
@@ -439,44 +441,62 @@ namespace velodyne16_rawdata
             else
               target_time = timestamp_last_;
 
+
+            //Set wait for transform duration: Wait 1s, but only every 5 seconds
+            static ros::Time last_wait_for_tf = ros::Time(0.0);
+            ros::Duration wait_for_tf_duration = ros::Duration(0.0);
+            const ros::Time time_before_tf = ros::Time::now();
+            if ((time_before_tf - last_wait_for_tf).toSec() > 1) {
+              wait_for_tf_duration = WAIT_FOR_TF_DURATION_DEFAULT_;
+              last_wait_for_tf = time_before_tf;
+              //high_resolution_clock::time_point t1 = high_resolution_clock::now();
+              try {
+                  tf_listener_->waitForTransform(frame_id_,target_time,
+                                     frame_id_, t_point.header.stamp,
+                                     config_.fixed_frame_id, wait_for_tf_duration);
+                } catch (std::exception& ex) {
+                // only log tf error once every second
+                ROS_WARN_THROTTLE(LOG_PERIOD_, "%s", ex.what());
+                }
+                //high_resolution_clock::time_point t2 = high_resolution_clock::now();
+                //auto duration = duration_cast<microseconds>( t2 - t1 ).count();
+                //std :: cout << "Time for waiting transform " << duration <<std::endl;
+            }
+
+             //high_resolution_clock::time_point t1 = high_resolution_clock::now();
             try {
 
-              // Set wait for transform duration: Wait 1s, but only every 5 seconds
-              static ros::Time last_wait_for_tf = ros::Time(0.0);
-              ros::Duration wait_for_tf_duration = ros::Duration(0.0);
-              const ros::Time time_before_tf = ros::Time::now();
-              if ((time_before_tf - last_wait_for_tf).toSec() > 5.0) {
-                wait_for_tf_duration = WAIT_FOR_TF_DURATION_DEFAULT_;
-              }
-
-              if (tf_listener_->waitForTransform(frame_id_,target_time,
-                                frame_id_, t_point.header.stamp,
-                                config_.fixed_frame_id, wait_for_tf_duration))              
-                  {
+              // if (tf_listener_->waitForTransform(frame_id_,target_time,
+              //                   frame_id_, t_point.header.stamp,
+              //                   config_.fixed_frame_id,ros::Duration(0.0)))              
+              //     {
                     tf_listener_->transformPoint(frame_id_, target_time, t_point, config_.fixed_frame_id, t_point);
                     point.x         = t_point.point.x;
                     point.y         = t_point.point.y;
                     point.z         = t_point.point.z;
                     point.intensity = (uint8_t)intensity;
-                  }
-                  else
-                  {
-                    // Set point to Nan and warn
-                    point.x = point.y = point.z = std::numeric_limits<float>::quiet_NaN();
-                    point.intensity = 0u;
-                    ROS_WARN_THROTTLE(LOG_PERIOD_, "Could not find a valid transform from frame %s to frame %s via fixed frame %s.", frame_id_.c_str(), frame_id_.c_str(), config_.fixed_frame_id.c_str());
+                  // }
+                  // else
+                  // {
+                  //   // Set point to Nan and warn
+                  //   point.x = point.y = point.z = std::numeric_limits<float>::quiet_NaN();
+                  //   point.intensity = 0u;
+                  //   ROS_WARN_THROTTLE(LOG_PERIOD_, "Could not find a valid transform from frame %s to frame %s via fixed frame %s.", frame_id_.c_str(), frame_id_.c_str(), config_.fixed_frame_id.c_str());
 
-                    // Remember last wait for transform time
-                    if (wait_for_tf_duration == WAIT_FOR_TF_DURATION_DEFAULT_) {
-                      last_wait_for_tf = time_before_tf;
-                    }
-                  }
+                  //   // Remember last wait for transform time
+                  //   //if (wait_for_tf_duration == WAIT_FOR_TF_DURATION_DEFAULT_) {
+                  //   //  last_wait_for_tf = time_before_tf;
+                  //   //}
+                  // }
             } catch (std::exception& ex) {
               // only log tf error once every second
               ROS_WARN_THROTTLE(LOG_PERIOD_, "%s", ex.what());
               point.x = point.y = point.z = std::numeric_limits<float>::quiet_NaN();
               point.intensity = 0u;
             }
+            //high_resolution_clock::time_point t2 = high_resolution_clock::now();
+            //auto duration = duration_cast<microseconds>( t2 - t1 ).count();
+            //if ( wait_for_tf_duration == WAIT_FOR_TF_DURATION_DEFAULT_) std :: cout << "Time for tf " << duration <<std::endl;
 
             if (dual_return && (block % 2 != 0))
               points_strongest_[row].push_back(point);

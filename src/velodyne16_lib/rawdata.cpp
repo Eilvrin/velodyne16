@@ -401,7 +401,6 @@ namespace velodyne16_rawdata
               point.z         = z_coord;
               point.intensity = (uint8_t)intensity;
             }
-            std::cout<<"Push"<<std::endl;
             points_strongest_[row].push_back(point);
           } else {
             // Last return

@@ -1,6 +1,7 @@
 /* -*- mode: C++ -*-
  *
  *  Copyright (C) 2011, 2012 Austin Robot Technology
+ *  Copyright (C) 2016 University of Freiburg
  *
  *  License: Modified BSD Software License Agreement
  *
@@ -23,10 +24,11 @@
 
 namespace velodyne16
 {
-  /** Euclidean Velodyne coordinate, including intensity and ring number. */
-  struct PointXYZIR
+  /** Euclidean Velodyne coordinate, including timestamp, intensity and ring number. */
+  struct PointXYZTIR
   {
     PCL_ADD_POINT4D;                    // quad-word XYZ
+    double   timestamp;                 ///< point timestamp
     float    intensity;                 ///< laser intensity reading
     uint16_t ring;                      ///< laser ring number
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW     // ensure proper alignment
@@ -34,10 +36,11 @@ namespace velodyne16
 
 }; // namespace velodyne16
 
-POINT_CLOUD_REGISTER_POINT_STRUCT(velodyne16::PointXYZIR,
+POINT_CLOUD_REGISTER_POINT_STRUCT(velodyne16::PointXYZTIR,
                                   (float, x, x)
                                   (float, y, y)
                                   (float, z, z)
+                                  (double, timestamp, timestamp)
                                   (float, intensity, intensity)
                                   (uint16_t, ring, ring))
 

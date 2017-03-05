@@ -19,7 +19,7 @@
   Convert::Convert(ros::NodeHandle node, ros::NodeHandle private_nh):
     data_(new velodyne16_rawdata::RawData())
   {
-    data_->setup(private_nh, &listener_);
+    data_->setup(private_nh);
 
     // advertise output point cloud (before subscribing to input data)
     output_ =
@@ -39,24 +39,17 @@
       node.subscribe("velodyne16/packets", 500,
                      &Convert::processPackets, (Convert *) this,
                      ros::TransportHints().tcpNoDelay(true));
-
-    // velodyne_packet_.subscribe(node, "velodyne16/packets", 2000);
-    // tf_filter_ = new tf::MessageFilter<velodyne16::VelodynePacket>(velodyne_packet_, listener_, "velodyne16", 2000);
-    // tf_filter_->registerCallback(boost::bind(&Convert::processPackets, this, _1));
-
   }
 
   void Convert::callback(velodyne16::CloudVLP16NodeConfig &config,
                         uint32_t level)
   {
   ROS_INFO("Reconfigure request.");
-  data_->setParameters(config.min_range, config.max_range, config.velodyne_static, config.fixed_frame_id);
+  data_->setParameters(config.min_range, config.max_range);
   }
 
   /** @brief Callback for raw packet messages. */
   void Convert::processPackets(const velodyne16::VelodynePacket::ConstPtr &packetMsg)
   {
-    //std::cout << "Process packet" << std::endl;
     data_->unpack_vlp16(packetMsg, output_, output2_);
-   // std::cout << "Finish packet" << std::endl;
   }

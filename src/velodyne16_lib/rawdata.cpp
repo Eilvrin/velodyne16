@@ -22,8 +22,6 @@
  */
 
 #include <velodyne16/rawdata.h>
-#include <chrono>
-using namespace std::chrono;
 
 namespace velodyne16_rawdata
 {
@@ -40,28 +38,18 @@ namespace velodyne16_rawdata
 
   /** Update parameters: conversions and update */
   void RawData::setParameters(double min_range,
-                              double max_range,
-                              bool velodyne_static,
-                              const std::string& fixed_frame_id)
+                              double max_range)
   {
     config_.min_range = min_range;
     config_.max_range = max_range;
-    config_.velodyne_static = velodyne_static;
-
-    // Fixed frame id
-    if (!config_.velodyne_static)
-    {
-      const std::string last_fixed_frame_id = config_.fixed_frame_id;
-      config_.fixed_frame_id = fixed_frame_id;
-      if (config_.fixed_frame_id != last_fixed_frame_id)
-        ROS_INFO_STREAM("Fixed frame: " << config_.fixed_frame_id);
-    }
   }
 
 
   /** Set up for on-line operation. */
   int RawData::setup(ros::NodeHandle private_nh, tf::TransformListener* tf_listener)
   {
+    // whether or not to use timestamp
+    private_nh.param("cloud_with_stamp", config_.cloud_with_stamp, false);
     // get path to angles.config file for this device
     if (!private_nh.getParam("calibration", config_.calibrationFile))
       {
@@ -146,6 +134,7 @@ namespace velodyne16_rawdata
     nan_point.x = nan_point.y = nan_point.z = std::numeric_limits<float>::quiet_NaN();
     nan_point.intensity = 0u;
     nan_point.ring = -1;
+    nan_point.timestamp = -1;
 
     // Process each block.
     for (int block = 0; block < BLOCKS_PER_PACKET; block++) {
@@ -384,6 +373,8 @@ namespace velodyne16_rawdata
           point.x = point.y = point.z = std::numeric_limits<float>::quiet_NaN();
           point.intensity = 0u;
           point.ring = corrections.laser_ring;
+          if (config_.cloud_with_stamp)
+            point.timestamp = (packetMsg->header.stamp + ros::Duration((block*VLP16_BLOCK_TDURATION+t_beam)*1.0e-6)).toSec();
 
           // Compute the row index of the point.
           int row = calibration_.num_lasers-1 - point.ring;
@@ -410,98 +401,16 @@ namespace velodyne16_rawdata
               point.z         = z_coord;
               point.intensity = (uint8_t)intensity;
             }
+            std::cout<<"Push"<<std::endl;
+            points_strongest_[row].push_back(point);
           } else {
             // Last return
             point.x         = x_coord;
             point.y         = y_coord;
             point.z         = z_coord;
             point.intensity = (uint8_t)intensity;
+            points_last_[row].push_back(point);
             if (dual_return) prev_last_[VLP16_SCANS_PER_FIRING*firing+row] = point;
-          }
-
-          if (config_.velodyne_static) {
-            // No tf transform, push points without transform
-            if (dual_return && (block % 2 != 0))
-              points_strongest_[row].push_back(point);
-            else
-              points_last_[row].push_back(point);
-          } else {
-            // Use tf transform, transform every single point
-            // from sensor frame to target frame.
-            geometry_msgs::PointStamped t_point;
-            t_point.header.frame_id = frame_id_;
-            t_point.header.stamp =  packetMsg->header.stamp + ros::Duration((block*VLP16_BLOCK_TDURATION+t_beam)*1.0e-6);
-            t_point.point.x         = point.x;
-            t_point.point.y         = point.y;
-            t_point.point.z         = point.z;
-
-            ros::Time target_time;
-            if (dual_return && (block % 2 != 0))
-              target_time = timestamp_strongest_;
-            else
-              target_time = timestamp_last_;
-
-
-            //Set wait for transform duration: Wait 1s, but only every 5 seconds
-            static ros::Time last_wait_for_tf = ros::Time(0.0);
-            ros::Duration wait_for_tf_duration = ros::Duration(0.0);
-            const ros::Time time_before_tf = ros::Time::now();
-            if ((time_before_tf - last_wait_for_tf).toSec() > 1) {
-              wait_for_tf_duration = WAIT_FOR_TF_DURATION_DEFAULT_;
-              last_wait_for_tf = time_before_tf;
-              //high_resolution_clock::time_point t1 = high_resolution_clock::now();
-              try {
-                  tf_listener_->waitForTransform(frame_id_,target_time,
-                                     frame_id_, t_point.header.stamp,
-                                     config_.fixed_frame_id, wait_for_tf_duration);
-                } catch (std::exception& ex) {
-                // only log tf error once every second
-                ROS_WARN_THROTTLE(LOG_PERIOD_, "%s", ex.what());
-                }
-                //high_resolution_clock::time_point t2 = high_resolution_clock::now();
-                //auto duration = duration_cast<microseconds>( t2 - t1 ).count();
-                //std :: cout << "Time for waiting transform " << duration <<std::endl;
-            }
-
-             //high_resolution_clock::time_point t1 = high_resolution_clock::now();
-            try {
-
-              // if (tf_listener_->waitForTransform(frame_id_,target_time,
-              //                   frame_id_, t_point.header.stamp,
-              //                   config_.fixed_frame_id,ros::Duration(0.0)))              
-              //     {
-                    tf_listener_->transformPoint(frame_id_, target_time, t_point, config_.fixed_frame_id, t_point);
-                    point.x         = t_point.point.x;
-                    point.y         = t_point.point.y;
-                    point.z         = t_point.point.z;
-                    point.intensity = (uint8_t)intensity;
-                  // }
-                  // else
-                  // {
-                  //   // Set point to Nan and warn
-                  //   point.x = point.y = point.z = std::numeric_limits<float>::quiet_NaN();
-                  //   point.intensity = 0u;
-                  //   ROS_WARN_THROTTLE(LOG_PERIOD_, "Could not find a valid transform from frame %s to frame %s via fixed frame %s.", frame_id_.c_str(), frame_id_.c_str(), config_.fixed_frame_id.c_str());
-
-                  //   // Remember last wait for transform time
-                  //   //if (wait_for_tf_duration == WAIT_FOR_TF_DURATION_DEFAULT_) {
-                  //   //  last_wait_for_tf = time_before_tf;
-                  //   //}
-                  // }
-            } catch (std::exception& ex) {
-              // only log tf error once every second
-              ROS_WARN_THROTTLE(LOG_PERIOD_, "%s", ex.what());
-              point.x = point.y = point.z = std::numeric_limits<float>::quiet_NaN();
-              point.intensity = 0u;
-            }
-            //high_resolution_clock::time_point t2 = high_resolution_clock::now();
-            //auto duration = duration_cast<microseconds>( t2 - t1 ).count();
-            //if ( wait_for_tf_duration == WAIT_FOR_TF_DURATION_DEFAULT_) std :: cout << "Time for tf " << duration <<std::endl;
-
-            if (dual_return && (block % 2 != 0))
-              points_strongest_[row].push_back(point);
-            else
-              points_last_[row].push_back(point);
           }
         } // Iterate over beams
       } // Iterate over firings

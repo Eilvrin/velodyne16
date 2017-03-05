@@ -38,7 +38,7 @@
 namespace velodyne16_rawdata
 {
   // Shorthand typedefs for point cloud representations
-  typedef velodyne16::PointXYZIR VPoint;
+  typedef velodyne16::PointXYZTIR VPoint;
   typedef pcl::PointCloud<VPoint> VPointCloud;
 
   /** Log rate for throttled warnings and errors in seconds */
@@ -67,7 +67,6 @@ namespace velodyne16_rawdata
 
   /** Treshold for strongest return. */
   static const double STRONGEST_TRESH_ = 0.001;
-  static const ros::Duration WAIT_FOR_TF_DURATION_DEFAULT_ = ros::Duration(0.001);
 
   /** \brief Raw Velodyne data block.
    *
@@ -126,7 +125,7 @@ namespace velodyne16_rawdata
      */
     int setup(ros::NodeHandle private_nh, tf::TransformListener* tf_listener = NULL);
 
-    void setParameters(double min_range, double max_range, bool velodyne_static, const std::string& fixed_frame_id = "");
+    void setParameters(double min_range, double max_range);
 
     /** @brief convert raw Velodyne packets to point cloud
      *
@@ -141,8 +140,7 @@ namespace velodyne16_rawdata
       std::string calibrationFile;     ///< calibration file name
       double max_range;                ///< maximum range to publish
       double min_range;                ///< minimum range to publish
-      bool velodyne_static;            ///< Whether or not to usee tf, if True do not use tf
-      std::string fixed_frame_id;     ///<  fixed frame for tf transform
+      bool cloud_with_stamp;           ///< Whether or not publish each point with the timestamp
     } Config;
     Config config_;
 

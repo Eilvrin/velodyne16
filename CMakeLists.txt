@@ -38,7 +38,7 @@ add_message_files(
 generate_messages(DEPENDENCIES std_msgs)
 
 generate_dynamic_reconfigure_options(
-  config/Velodyne16Node.cfg config/CloudVLP16Node.cfg
+  config/Velodyne16Node.cfg config/CloudVLP16Node.cfg config/TransformVLP16Node.cfg
 )
 
 if(NOT ${YAML_CPP_VERSION} VERSION_LESS "0.5")
@@ -62,12 +62,15 @@ target_link_libraries(velodyne16_lib ${catkin_LIBRARIES} ${YAML_CPP_LIBRARIES})
 
 add_executable(velodyne16_node src/velodyne16_node/velodyne16_node.cpp src/velodyne16_node/driver.cpp)
 add_executable(cloud_vlp16_node src/cloud_vlp16_node/cloud_vlp16_node.cpp src/cloud_vlp16_node/convert.cpp)
+add_executable(transform_vlp16_node src/transform_vlp16_node/transform_vlp16_node.cpp src/transform_vlp16_node/transform.cpp)
 
 add_dependencies(velodyne16_node velodyne16_gencfg)
 add_dependencies(cloud_vlp16_node velodyne16_gencfg)
+add_dependencies(transform_vlp16_node velodyne16_gencfg)
 
 target_link_libraries(velodyne16_node ${catkin_LIBRARIES})
 target_link_libraries(cloud_vlp16_node velodyne16_lib ${catkin_LIBRARIES})
+target_link_libraries(transform_vlp16_node velodyne16_lib ${catkin_LIBRARIES})
 
 # Installation
 

@@ -23,9 +23,9 @@
 
     // advertise output point cloud (before subscribing to input data)
     output_ =
-      node.advertise<sensor_msgs::PointCloud2>("velodyne16/points/last", 10);
+      node.advertise<velodyne16_rawdata::VPointCloud>("velodyne16/points/last", 10);
     output2_ =
-      node.advertise<sensor_msgs::PointCloud2>("velodyne16/points/strongest", 10);
+      node.advertise<velodyne16_rawdata::VPointCloud>("velodyne16/points/strongest", 10);
 
     srv_ = boost::make_shared <dynamic_reconfigure::Server<velodyne16::
       CloudVLP16NodeConfig> > (private_nh);

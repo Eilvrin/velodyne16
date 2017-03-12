@@ -133,7 +133,6 @@ namespace velodyne16_rawdata
     VPoint nan_point;
     nan_point.x = nan_point.y = nan_point.z = std::numeric_limits<float>::quiet_NaN();
     nan_point.intensity = 0u;
-    nan_point.ring = -1;
     nan_point.timestamp = -1;
 
     // Process each block.
@@ -372,12 +371,11 @@ namespace velodyne16_rawdata
           VPoint point;
           point.x = point.y = point.z = std::numeric_limits<float>::quiet_NaN();
           point.intensity = 0u;
-          point.ring = corrections.laser_ring;
           if (config_.cloud_with_stamp)
             point.timestamp = (packetMsg->header.stamp + ros::Duration((block*VLP16_BLOCK_TDURATION+t_beam)*1.0e-6)).toSec();
 
           // Compute the row index of the point.
-          int row = calibration_.num_lasers-1 - point.ring;
+          int row = calibration_.num_lasers-1 - corrections.laser_ring;
 
           if (!pointInRange(distance))
           {

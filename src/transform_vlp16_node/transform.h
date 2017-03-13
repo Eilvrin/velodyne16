@@ -26,6 +26,9 @@
 
 #include <tf/transform_listener.h>
 
+static const double LOG_PERIOD_ = 1.0;
+
+
 class Transform
 {
 public:
@@ -37,8 +40,8 @@ private:
   
   void callback(velodyne16::TransformVLP16NodeConfig &config,
                 uint32_t level);
-  void processScansLast(const velodyne16_rawdata::VPointCloud::ConstPtr &scanMsg);
-  void processScansStrongest(const velodyne16_rawdata::VPointCloud::ConstPtr &scanMsg);
+  void processScansLast(const velodyne16_rawdata::VPointCloud::ConstPtr &pc);
+  void processScansStrongest(const velodyne16_rawdata::VPointCloud::ConstPtr &pc);
 
   ///Pointer to dynamic reconfigure service srv_
   boost::shared_ptr<dynamic_reconfigure::Server<velodyne16::

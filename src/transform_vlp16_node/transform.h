@@ -21,13 +21,12 @@
 #include <velodyne16/rawdata.h>
 #include <velodyne16/point_types.h>
 
-#include <dynamic_reconfigure/server.h>
-#include <velodyne16/TransformVLP16NodeConfig.h>
-
 #include <tf/transform_listener.h>
 
+/** Log rate for throttled warnings and errors in seconds */
 static const double LOG_PERIOD_ = 1.0;
-
+/** Time to wait after startup of the node*/
+static const float WAIT_FOR_TF_AFTER_START_ = 3.0;
 
 class Transform
 {
@@ -38,16 +37,13 @@ public:
 
 private:
   
-  void callback(velodyne16::TransformVLP16NodeConfig &config,
-                uint32_t level);
   void processScansLast(const velodyne16_rawdata::VPointCloud::ConstPtr &pc);
   void processScansStrongest(const velodyne16_rawdata::VPointCloud::ConstPtr &pc);
-
-  ///Pointer to dynamic reconfigure service srv_
-  boost::shared_ptr<dynamic_reconfigure::Server<velodyne16::
-    TransformVLP16NodeConfig> > srv_;
+  // bool return_mode:
+  // 0 - Last return, 1 - Strongest return
+  void processScan(const velodyne16_rawdata::VPointCloud::ConstPtr &pc, bool return_mode,
+                  pcl::PointCloud<pcl::PointXYZI>::Ptr &outMsg);
     
-  // boost::shared_ptr<velodyne16_rawdata::RawData> data_;
   ros::Subscriber velodyne_points_last_;
   ros::Subscriber velodyne_points_strongest_;
   ros::Publisher output_;

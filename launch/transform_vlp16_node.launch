@@ -1,0 +1,11 @@
+<!-- -*- mode: XML -*- -->
+
+<launch>
+
+  # Publish Velodyne lidar scans
+  <node name="transform_vlp16_node" pkg="velodyne16" type="transform_vlp16_node"
+    required="true" output="screen">
+    <rosparam file="$(find velodyne16)/config/transform_vlp16_node.yaml" command="load" />
+  </node>
+
+</launch>

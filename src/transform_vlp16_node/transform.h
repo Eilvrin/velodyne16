@@ -59,6 +59,7 @@ private:
 
   int prev_msg_seq_strongest_;
   int prev_msg_seq_last_;
+
 };
 
 

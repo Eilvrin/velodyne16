@@ -48,6 +48,12 @@ using namespace std::chrono;
   /** @brief Callback for messages. */
   void Transform::processScansLast(const velodyne16_rawdata::VPointCloud::ConstPtr &pc)
   {
+    static ros::Time start_time_ = ros::Time::now();
+
+    // Discard messages received in the first seconds after startup, as tf might not be available
+    if ((pcl_conversions::fromPCL(pc->header.stamp) - start_time_).toSec() < 3.0) return;
+
+
     // Check sequence id of messages
     int msg_seq_last = pc->header.seq;
 
@@ -55,17 +61,16 @@ using namespace std::chrono;
       ROS_WARN("The sequence of last point clouds is not different by 1. prev_msg_seq: %i, msg_seq: %i", prev_msg_seq_last_, msg_seq_last);
     prev_msg_seq_last_ = msg_seq_last;
 
-    velodyne16_rawdata::VPointCloud::Ptr outMsg(new velodyne16_rawdata::VPointCloud());
+    pcl::PointCloud<pcl::PointXYZI>::Ptr outMsg(new pcl::PointCloud<pcl::PointXYZI>());
     outMsg->header.stamp = pc->header.stamp;
     std::string frame_id = pc->header.frame_id;
     outMsg->header.frame_id = frame_id;
     outMsg->width = pc->width;
     outMsg->height = pc->height;
 
-    velodyne16_rawdata::VPoint nan_point;
+    pcl::PointXYZI nan_point;
     nan_point.x = nan_point.y = nan_point.z = std::numeric_limits<float>::quiet_NaN();
     nan_point.intensity = 0u;
-    nan_point.timestamp = -1;
     outMsg->points.resize(outMsg->width * outMsg->height, nan_point);
 
     if (pc->at(pc->width-1, pc->height-1).timestamp == -1.0)
@@ -83,7 +88,7 @@ using namespace std::chrono;
     try {    
       listener_.waitForTransform(frame_id, target_time,   
                                  frame_id, timestamp_end_point,   
-                                 fixed_frame_id_, ros::Duration(10.0));   
+                                 fixed_frame_id_, ros::Duration(1.0));   
     } catch (std::exception& ex) {       
       ROS_WARN_THROTTLE(LOG_PERIOD_, "%s", ex.what());    
     }
@@ -118,7 +123,6 @@ using namespace std::chrono;
         outMsg->points[i].y = t_point.point.y;
         outMsg->points[i].z = t_point.point.z;
         outMsg->points[i].intensity = pc->points[i].intensity;
-        outMsg->points[i].timestamp = pc->points[i].timestamp;
       }
     }
 
@@ -133,6 +137,10 @@ using namespace std::chrono;
     /** @brief Callback for messages. */
   void Transform::processScansStrongest(const velodyne16_rawdata::VPointCloud::ConstPtr &pc)
   {
+    // Discard messages received in the first seconds after startup, as tf might not be available
+    static ros::Time start_time_ = ros::Time::now();
+    if ((pcl_conversions::fromPCL(pc->header.stamp) - start_time_).toSec() < 3.0) return;
+
     // Check sequence id of messages
     int msg_seq_strongest = pc->header.seq;
 
@@ -141,17 +149,16 @@ using namespace std::chrono;
     prev_msg_seq_strongest_ = msg_seq_strongest;
 
    
-    velodyne16_rawdata::VPointCloud::Ptr outMsg(new velodyne16_rawdata::VPointCloud());
+    pcl::PointCloud<pcl::PointXYZI>::Ptr outMsg(new pcl::PointCloud<pcl::PointXYZI>());
     outMsg->header.stamp = pc->header.stamp;
     std::string frame_id = pc->header.frame_id;
     outMsg->header.frame_id = frame_id;
     outMsg->width = pc->width;
     outMsg->height = pc->height;
 
-    velodyne16_rawdata::VPoint nan_point;
+    pcl::PointXYZI nan_point;
     nan_point.x = nan_point.y = nan_point.z = std::numeric_limits<float>::quiet_NaN();
     nan_point.intensity = 0u;
-    nan_point.timestamp = -1;
     outMsg->points.resize(outMsg->width * outMsg->height, nan_point);
 
     if (pc->at(pc->width-1, pc->height-1).timestamp == -1.0)
@@ -168,7 +175,7 @@ using namespace std::chrono;
     try {    
       listener_.waitForTransform(frame_id, target_time,   
                                  frame_id, timestamp_end_point,   
-                                 fixed_frame_id_, ros::Duration(10.0));   
+                                 fixed_frame_id_, ros::Duration(1.0));   
     } catch (std::exception& ex) {       
       ROS_WARN_THROTTLE(LOG_PERIOD_, "%s", ex.what());    
     }
@@ -196,7 +203,6 @@ using namespace std::chrono;
         outMsg->points[i].y = t_point.point.y;
         outMsg->points[i].z = t_point.point.z;
         outMsg->points[i].intensity = pc->points[i].intensity;
-        outMsg->points[i].timestamp = pc->points[i].timestamp;
       }
     }
 

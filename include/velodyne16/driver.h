@@ -14,7 +14,7 @@
  */
 
 #ifndef _VELODYNE_DRIVER_H_
-#define _VELODYNE_DRIVER_H_ 
+#define _VELODYNE_DRIVER_H_
 
 // Stdlib
 #include <arpa/inet.h>
@@ -35,9 +35,8 @@
 #include <velodyne16/DriverNodeConfig.h>
 #include <velodyne16/VelodynePacket.h>
 
-class VelodyneDriver
-{
-  public:
+class VelodyneDriver {
+ public:
 
   VelodyneDriver(ros::NodeHandle node,
                  ros::NodeHandle private_nh);
@@ -45,11 +44,11 @@ class VelodyneDriver
 
   bool publishPacket(void);
 
-  private:
+ private:
 
   // Callback for dynamic reconfigure
   void callback(velodyne16::DriverNodeConfig &config,
-              uint32_t level);
+                uint32_t level);
   bool getPacket(velodyne16::VelodynePacketPtr pkt, const double time_offset);
   uint32_t getPacketTime(velodyne16::VelodynePacketPtr pkt);
 

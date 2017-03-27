@@ -14,8 +14,7 @@
 
 #include "../include/velodyne16/driver.h"
 
-int main(int argc, char** argv)
-{
+int main(int argc, char **argv) {
   ros::init(argc, argv, "driver_node");
   ros::NodeHandle node;
   ros::NodeHandle private_nh("~");
@@ -24,10 +23,9 @@ int main(int argc, char** argv)
   VelodyneDriver dvr(node, private_nh);
 
   // loop until shut down
-  while(ros::ok() && dvr.publishPacket())
-    {
-      ros::spinOnce();
-    }
+  while (ros::ok() && dvr.publishPacket()) {
+    ros::spinOnce();
+  }
 
   return 0;
 }

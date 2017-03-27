@@ -1,34 +1,34 @@
 <?xml version="1.0"?>
 <package>
-  <name>velodyne16</name>
-  <version>0.1.0</version>
-  <description>
-     ROS device driver and point cloud conversion for Velodyne-16.
-  </description>
-  <license>BSD</license>
-  <maintainer email="o.o.kutkina@gmail.com">Oksana Kutkina</maintainer>
-  <author>Oksana Kutkina</author>
-  
-  <buildtool_depend>catkin</buildtool_depend>
-  
-  <build_depend>roscpp</build_depend>
-  <build_depend>dynamic_reconfigure</build_depend>
-  <build_depend>tf</build_depend>
-  <build_depend>message_generation</build_depend>
-  <build_depend>std_msgs</build_depend>
-  <build_depend>pcl_conversions</build_depend>
-  <build_depend>pcl_ros</build_depend>
-  <build_depend>yaml-cpp</build_depend>
-  <build_depend>angles</build_depend>
-  
-  <run_depend>roscpp</run_depend>
-  <run_depend>dynamic_reconfigure</run_depend>
-  <run_depend>tf</run_depend>
-  <run_depend>message_runtime</run_depend>
-  <run_depend>std_msgs</run_depend>
-  <run_depend>pcl_ros</run_depend>
-  <run_depend>python-yaml</run_depend>
-  <run_depend>yaml-cpp</run_depend>
-  <run_depend>angles</run_depend>
- 
+    <name>velodyne16</name>
+    <version>0.1.0</version>
+    <description>
+        ROS device driver and point cloud conversion for Velodyne-16.
+    </description>
+    <license>BSD</license>
+    <maintainer email="o.o.kutkina@gmail.com">Oksana Kutkina</maintainer>
+    <author>Oksana Kutkina</author>
+
+    <buildtool_depend>catkin</buildtool_depend>
+
+    <build_depend>roscpp</build_depend>
+    <build_depend>dynamic_reconfigure</build_depend>
+    <build_depend>tf</build_depend>
+    <build_depend>message_generation</build_depend>
+    <build_depend>std_msgs</build_depend>
+    <build_depend>pcl_conversions</build_depend>
+    <build_depend>pcl_ros</build_depend>
+    <build_depend>yaml-cpp</build_depend>
+    <build_depend>angles</build_depend>
+
+    <run_depend>roscpp</run_depend>
+    <run_depend>dynamic_reconfigure</run_depend>
+    <run_depend>tf</run_depend>
+    <run_depend>message_runtime</run_depend>
+    <run_depend>std_msgs</run_depend>
+    <run_depend>pcl_ros</run_depend>
+    <run_depend>python-yaml</run_depend>
+    <run_depend>yaml-cpp</run_depend>
+    <run_depend>angles</run_depend>
+
 </package>

@@ -18,30 +18,30 @@
 #ifndef _VELODYNE_POINTCLOUD_CONVERT_H_
 #define _VELODYNE_POINTCLOUD_CONVERT_H_ 
 
-#include <ros/ros.h>
 #include <dynamic_reconfigure/server.h>
 #include <pcl_conversions/pcl_conversions.h>
+#include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
 
-#include <velodyne16/rawdata.h>
-#include <velodyne16/CloudVLP16NodeConfig.h>
+#include "rawdata.h"
+#include <velodyne16/CloudNodeConfig.h>
 
 class Convert
 {
 public:
 
   Convert(ros::NodeHandle node, ros::NodeHandle private_nh);
-  ~Convert() {}
+  virtual ~Convert() {}
 
 private:
   
-  void callback(velodyne16::CloudVLP16NodeConfig &config,
+  void callback(velodyne16::CloudNodeConfig &config,
                 uint32_t level);
   void processPackets(const velodyne16::VelodynePacket::ConstPtr &packetMsg);
 
   ///Pointer to dynamic reconfigure service srv_
   boost::shared_ptr<dynamic_reconfigure::Server<velodyne16::
-    CloudVLP16NodeConfig> > srv_;
+    CloudNodeConfig> > srv_;
     
   boost::shared_ptr<velodyne16_rawdata::RawData> data_;
   ros::Subscriber velodyne_packet_;

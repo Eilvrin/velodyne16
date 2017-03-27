@@ -13,7 +13,7 @@
 
 */
 
-#include "velodyne16/convert.h"
+#include "../include/velodyne16/convert.h"
 
   /** @brief Constructor. */
   Convert::Convert(ros::NodeHandle node, ros::NodeHandle private_nh):
@@ -28,8 +28,8 @@
       node.advertise<sensor_msgs::PointCloud2>("velodyne16/points/strongest", 10);
 
     srv_ = boost::make_shared <dynamic_reconfigure::Server<velodyne16::
-      CloudVLP16NodeConfig> > (private_nh);
-    dynamic_reconfigure::Server<velodyne16::CloudVLP16NodeConfig>::
+      CloudNodeConfig> > (private_nh);
+    dynamic_reconfigure::Server<velodyne16::CloudNodeConfig>::
       CallbackType f;
     f = boost::bind (&Convert::callback, this, _1, _2);
     srv_->setCallback (f);
@@ -41,7 +41,7 @@
                      ros::TransportHints().tcpNoDelay(true));
   }
 
-  void Convert::callback(velodyne16::CloudVLP16NodeConfig &config,
+  void Convert::callback(velodyne16::CloudNodeConfig &config,
                         uint32_t level)
   {
   ROS_INFO("Reconfigure request.");

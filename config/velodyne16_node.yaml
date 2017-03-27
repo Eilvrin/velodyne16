@@ -1,4 +1,0 @@
-frame_id: velodyne16
-port: 2368
-time_offset: 0
-device_ip: ""

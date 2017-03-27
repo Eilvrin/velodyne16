@@ -57,7 +57,7 @@ namespace velodyne16_rawdata
 
         // have to use something: grab unit test version as a default
         std::string pkgPath = ros::package::getPath("velodyne16");
-        config_.calibrationFile = pkgPath + "/config/velodyne16_calibration.yaml";
+        config_.calibrationFile = pkgPath + "/config/calibration.yaml";
       }
 
     ROS_INFO_STREAM("correction angles: " << config_.calibrationFile);

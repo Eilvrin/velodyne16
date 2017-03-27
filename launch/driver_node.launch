@@ -1,0 +1,11 @@
+<!-- -*- mode: XML -*- -->
+
+<launch>
+
+  # Publish raw Velodyne lidar data packets
+  <node name="driver_node" pkg="velodyne16" type="driver_node"
+    required="true" output="screen">
+    <rosparam file="$(find velodyne16)/config/driver_node.yaml" command="load" />
+  </node>
+
+</launch>

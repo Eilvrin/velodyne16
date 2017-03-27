@@ -16,23 +16,24 @@
 #ifndef _VELODYNE_DRIVER_H_
 #define _VELODYNE_DRIVER_H_ 
 
-#include <ros/ros.h>
-#include <string>
- 
-#include <dynamic_reconfigure/server.h>
-#include <velodyne16/Velodyne16NodeConfig.h>
-
-#include <tf/transform_listener.h>
-#include <velodyne16/VelodynePacket.h>
-
-// Socket headers 
-#include <sys/socket.h>
+// Stdlib
 #include <arpa/inet.h>
-#include <poll.h>
-#include <fcntl.h>
-#include <errno.h>
-
 #include <cstdlib> // EXIT_SUCCESS, EXIT_FAILURE
+#include <errno.h>
+#include <fcntl.h>
+#include <poll.h>
+#include <string>
+#include <sys/socket.h>
+
+// ROS
+#include <ros/ros.h>
+#include <dynamic_reconfigure/server.h>
+#include <tf/transform_listener.h>
+
+
+// package internal
+#include <velodyne16/DriverNodeConfig.h>
+#include <velodyne16/VelodynePacket.h>
 
 class VelodyneDriver
 {
@@ -41,19 +42,19 @@ class VelodyneDriver
   VelodyneDriver(ros::NodeHandle node,
                  ros::NodeHandle private_nh);
   virtual ~VelodyneDriver();
-  
+
   bool publishPacket(void);
 
   private:
 
   // Callback for dynamic reconfigure
-  void callback(velodyne16::Velodyne16NodeConfig &config,
+  void callback(velodyne16::DriverNodeConfig &config,
               uint32_t level);
   bool getPacket(velodyne16::VelodynePacketPtr pkt, const double time_offset);
   uint32_t getPacketTime(velodyne16::VelodynePacketPtr pkt);
 
   // Pointer to dynamic reconfigure service srv_
-  boost::shared_ptr<dynamic_reconfigure::Server<velodyne16::Velodyne16NodeConfig> > srv_;
+  boost::shared_ptr<dynamic_reconfigure::Server<velodyne16::DriverNodeConfig> > srv_;
 
   std::string frame_id_;            ///< tf frame ID
   double time_offset_;              ///< time in seconds added to each velodyne time stamp

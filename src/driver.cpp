@@ -35,7 +35,7 @@ VelodyneDriver::VelodyneDriver(ros::NodeHandle node,
       address = inet_addr(devip_str_.c_str());
       if (address == -1) 
         {
-        ROS_ERROR_STREAM ("Error in IP adress: " << devip_str_);
+        ROS_ERROR_STREAM ("Error in IP address: " << devip_str_);
         node.shutdown();
         exit(EXIT_FAILURE);
       } else {
@@ -51,7 +51,7 @@ VelodyneDriver::VelodyneDriver(ros::NodeHandle node,
   sockfd_ = socket(PF_INET, SOCK_DGRAM, 0);
   if (sockfd_ == -1)
     {
-      ROS_ERROR ("Error openning socket.");
+      ROS_ERROR ("Error opening socket.");
       perror("socket");
       node.shutdown();
       exit(EXIT_FAILURE);
@@ -81,8 +81,8 @@ VelodyneDriver::VelodyneDriver(ros::NodeHandle node,
 
   // Initialize dynamic reconfigure
   srv_ = boost::make_shared <dynamic_reconfigure::Server<velodyne16::
-    Velodyne16NodeConfig> > (private_nh);
-  dynamic_reconfigure::Server<velodyne16::Velodyne16NodeConfig>::
+    DriverNodeConfig> > (private_nh);
+  dynamic_reconfigure::Server<velodyne16::DriverNodeConfig>::
     CallbackType f;
   f = boost::bind (&VelodyneDriver::callback, this, _1, _2);
   srv_->setCallback (f); // Set callback function und call initially
@@ -100,7 +100,7 @@ VelodyneDriver::~VelodyneDriver()
  if (sockfd_!= -1) close(sockfd_);
 }
 
-void VelodyneDriver::callback(velodyne16::Velodyne16NodeConfig &config,
+void VelodyneDriver::callback(velodyne16::DriverNodeConfig &config,
               uint32_t level)
 {
   ROS_INFO("Reconfigure Request");

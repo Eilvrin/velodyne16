@@ -30,7 +30,7 @@ class Transform
 public:
 
   Transform(ros::NodeHandle node, ros::NodeHandle private_nh);
-  ~Transform() {}
+  virtual ~Transform() {}
 
 private:
   

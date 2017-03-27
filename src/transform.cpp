@@ -102,7 +102,7 @@
       ROS_WARN_THROTTLE(LOG_PERIOD_, "%s", ex.what());    
     }
 
-    for (int i =0; i<pc->points.size();++i)
+    for (unsigned int i =0; i<pc->points.size();++i)
     {
       if (!std::isnan(pc->points[i].x) || !std::isnan(pc->points[i].y) || !std::isnan(pc->points[i].z))
       {

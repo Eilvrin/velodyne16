@@ -109,7 +109,7 @@ namespace velodyne16_rawdata
   public:
 
     RawData();
-    ~RawData() {}
+    virtual ~RawData() {}
 
     /** \brief Set up for data processing.
      *

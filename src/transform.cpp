@@ -10,7 +10,7 @@
     This class applies tf transform to the Velodyne 16 point clouds.
 
 */
-#include "transform.h"
+#include "../include/velodyne16/transform.h"
 
 /** @brief Constructor. */
   Transform::Transform(ros::NodeHandle node, ros::NodeHandle private_nh): prev_msg_seq_strongest_(-1), prev_msg_seq_last_(-1)

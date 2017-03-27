@@ -15,13 +15,10 @@
 #define _VELODYNE_POINTCLOUD_TRANSFORM_H_ 
 
 #include <ros/ros.h>
-
 #include <sensor_msgs/PointCloud2.h>
-
-#include <velodyne16/rawdata.h>
-#include <velodyne16/point_types.h>
-
 #include <tf/transform_listener.h>
+
+#include "rawdata.h"
 
 /** Log rate for throttled warnings and errors in seconds */
 static const double LOG_PERIOD_ = 1.0;

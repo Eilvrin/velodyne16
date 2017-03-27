@@ -1,5 +1,5 @@
 /**
- * \file  calibration.cc
+ * \file  calibration.cpp
  * \brief  
  *
  * \author  Piyush Khandelwal (piyushk@cs.utexas.edu)

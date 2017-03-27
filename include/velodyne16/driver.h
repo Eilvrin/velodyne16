@@ -34,16 +34,13 @@
 
 #include <cstdlib> // EXIT_SUCCESS, EXIT_FAILURE
 
-
-static uint16_t DATA_PORT_NUMBER = 2368;
-
 class VelodyneDriver
 {
   public:
 
   VelodyneDriver(ros::NodeHandle node,
                  ros::NodeHandle private_nh);
-  ~VelodyneDriver();
+  virtual ~VelodyneDriver();
   
   bool publishPacket(void);
 

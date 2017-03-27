@@ -9,8 +9,7 @@
     This ROS node applies tf transform to the Velodyne 16 point clouds.
 */
 
-#include <ros/ros.h>
-#include "transform.h"
+#include "../include/velodyne16/transform.h"
 
 /** Main node entry point. */
 int main(int argc, char **argv)

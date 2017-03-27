@@ -17,23 +17,24 @@
 #ifndef __VELODYNE_RAWDATA_H
 #define __VELODYNE_RAWDATA_H
 
+// Stdlib
+#include <algorithm>
+#include <cmath>
 #include <fstream>
 #include <string>
-#include <math.h>
-#include <stdint.h>
-#include <algorithm>
-#include <iterator>
 #include <vector>
 
-#include <ros/ros.h>
-#include <ros/package.h>
-
+// ROS
 #include <angles/angles.h>
+#include <ros/package.h>
+#include <ros/ros.h>
 #include <pcl_ros/point_cloud.h>
-#include <velodyne16/point_types.h>
-#include <velodyne16/calibration.h>
 #include <tf/transform_listener.h>
+
+// Package internal
 #include <velodyne16/VelodynePacket.h>
+#include "calibration.h"
+#include "point_types.h"
 
 namespace velodyne16_rawdata
 {
@@ -162,8 +163,8 @@ namespace velodyne16_rawdata
     ros::Time prev_pkt_time_; // previous timestamp
     int prev_pkt_seq_;
 
-    float prev_asymuth_strongest_; // previous asymuth for strongest return
-    float prev_asymuth_last_; // previous asymuth for last return
+    float prev_azimuth_strongest_; // previous asymuth for strongest return
+    float prev_azimuth_last_; // previous asymuth for last return
 
     VPointCloud out_cloud_last_;
     VPointCloud out_cloud_strongest_;

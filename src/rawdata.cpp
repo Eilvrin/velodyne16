@@ -21,7 +21,7 @@
  *
  */
 
-#include <velodyne16/rawdata.h>
+#include "../include/velodyne16/rawdata.h"
 
 namespace velodyne16_rawdata
 {
@@ -32,7 +32,7 @@ namespace velodyne16_rawdata
   ////////////////////////////////////////////////////////////////////////
 
   RawData::RawData()
-      : tf_listener_(NULL), prev_asymuth_strongest_(-1), prev_asymuth_last_(-1), prev_pkt_time_(0), timestamp_strongest_(0), timestamp_last_(0), prev_pkt_seq_(-1)
+      : timestamp_strongest_(0), timestamp_last_(0), tf_listener_(NULL), prev_pkt_time_(0), prev_pkt_seq_(-1), prev_azimuth_strongest_(-1), prev_azimuth_last_(-1)
   {
   }
 
@@ -186,7 +186,7 @@ namespace velodyne16_rawdata
           // Publish if we received the whole scan
           if (dual_return && (block % 2 != 0))
           {
-            if (azimuth_corrected_f < prev_asymuth_strongest_)
+            if (azimuth_corrected_f < prev_azimuth_strongest_)
             {
               velodyne16_rawdata::VPointCloud::Ptr outMsgStrongest(new velodyne16_rawdata::VPointCloud());
               // Convert ros time to pcl time.
@@ -194,16 +194,16 @@ namespace velodyne16_rawdata
               outMsgStrongest->header.frame_id = frame_id_;
 
               // Determine the max size of points
-              unsigned max_size = points_strongest_[0].size();
-              for(int i = 1; i < points_strongest_.size(); i++)
-                max_size = std::max<unsigned>(points_strongest_[i].size(), max_size);
+              unsigned long max_size = points_strongest_[0].size();
+              for(unsigned int i = 1; i < points_strongest_.size(); i++)
+                max_size = std::max<unsigned long>(points_strongest_[i].size(), max_size);
 
               // Initialize the organized output point cloud.
               outMsgStrongest->width = max_size;
               outMsgStrongest->height = calibration_.num_lasers;
               outMsgStrongest->points.resize(outMsgStrongest->width * outMsgStrongest->height, nan_point);
 
-              for(int i = 0; i < points_strongest_.size(); i++)
+              for(unsigned int i = 0; i < points_strongest_.size(); i++)
               {
                 outMsgStrongest->points.insert(
                   outMsgStrongest->points.begin() + i*outMsgStrongest->width,
@@ -221,10 +221,10 @@ namespace velodyne16_rawdata
               points_strongest_.clear();
               points_strongest_.resize(VLP16_SCANS_PER_FIRING);
             }
-            prev_asymuth_strongest_ = azimuth_corrected_f;
+            prev_azimuth_strongest_ = azimuth_corrected_f;
           } else
           {
-            if (azimuth_corrected_f < prev_asymuth_last_)
+            if (azimuth_corrected_f < prev_azimuth_last_)
             {
               velodyne16_rawdata::VPointCloud::Ptr outMsgLast(new velodyne16_rawdata::VPointCloud());
               // Convert ros time to pcl time.
@@ -233,7 +233,7 @@ namespace velodyne16_rawdata
 
               // Determine the max size of points
               unsigned max_size = points_last_[0].size();
-              for(int i = 1; i < points_last_.size(); i++)
+              for(unsigned int i = 1; i < points_last_.size(); i++)
                 max_size = std::max<unsigned>(points_last_[i].size(), max_size);
 
               // Initialize the organized output point cloud.
@@ -241,7 +241,7 @@ namespace velodyne16_rawdata
               outMsgLast->height = calibration_.num_lasers;
               outMsgLast->points.resize(outMsgLast->width * outMsgLast->height, nan_point);
 
-              for(int i = 0; i < points_last_.size(); i++)
+              for(unsigned int i = 0; i < points_last_.size(); i++)
               {
                 outMsgLast->points.insert(
                 outMsgLast->points.begin() + i*outMsgLast->width,
@@ -259,7 +259,7 @@ namespace velodyne16_rawdata
               points_last_.clear();
               points_last_.resize(VLP16_SCANS_PER_FIRING);
             }
-            prev_asymuth_last_ = azimuth_corrected_f;
+            prev_azimuth_last_ = azimuth_corrected_f;
           }
 
           velodyne16::LaserCorrection &corrections =

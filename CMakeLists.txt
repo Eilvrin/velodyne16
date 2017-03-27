@@ -55,14 +55,14 @@ catkin_package(
 include_directories(include ${catkin_INCLUDE_DIRS})
 
 add_library(velodyne16_lib
-src/velodyne16_lib/calibration.cc
-src/velodyne16_lib/rawdata.cpp)
+    src/calibration.cpp
+    src/rawdata.cpp)
 
 target_link_libraries(velodyne16_lib ${catkin_LIBRARIES} ${YAML_CPP_LIBRARIES})
 
-add_executable(velodyne16_node src/velodyne16_node/velodyne16_node.cpp src/velodyne16_node/driver.cpp)
-add_executable(cloud_vlp16_node src/cloud_vlp16_node/cloud_vlp16_node.cpp src/cloud_vlp16_node/convert.cpp)
-add_executable(transform_vlp16_node src/transform_vlp16_node/transform_vlp16_node.cpp src/transform_vlp16_node/transform.cpp)
+add_executable(velodyne16_node src/velodyne16_node.cpp src/driver.cpp)
+add_executable(cloud_vlp16_node src/cloud_vlp16_node.cpp src/convert.cpp)
+add_executable(transform_vlp16_node src/transform_vlp16_node.cpp src/transform.cpp)
 
 add_dependencies(velodyne16_node velodyne16_gencfg)
 add_dependencies(cloud_vlp16_node velodyne16_gencfg)

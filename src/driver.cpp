@@ -13,7 +13,7 @@
  *  ROS driver implementation for the Velodyne 3D LIDARs
  */
 
-#include "driver.h"
+#include "../include/velodyne16/driver.h"
 
 VelodyneDriver::VelodyneDriver(ros::NodeHandle node,
                                ros::NodeHandle private_nh)
@@ -24,7 +24,7 @@ VelodyneDriver::VelodyneDriver(ros::NodeHandle node,
   ROS_DEBUG_STREAM("tf_prefix: " << tf_prefix);
   frame_id_ = tf::resolve(tf_prefix, frame_id_);
 
-  private_nh.param("port", port_, (int) DATA_PORT_NUMBER);
+  private_nh.param("port", port_, 2368);
 
   private_nh.param("device_ip", devip_str_, std::string(""));
   if (!devip_str_.empty())

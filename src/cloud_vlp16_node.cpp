@@ -10,8 +10,7 @@
     This ROS node converts raw Velodyne LIDAR packets to PointCloud2.
 */
 
-#include <ros/ros.h>
-#include "convert.h"
+#include "../include/velodyne16/convert.h"
 
 /** Main node entry point. */
 int main(int argc, char **argv)

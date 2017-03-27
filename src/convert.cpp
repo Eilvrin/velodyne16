@@ -13,7 +13,7 @@
 
 */
 
-#include "convert.h"
+#include "velodyne16/convert.h"
 
   /** @brief Constructor. */
   Convert::Convert(ros::NodeHandle node, ros::NodeHandle private_nh):

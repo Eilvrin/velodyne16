@@ -53,3 +53,7 @@ unused/
 /code/ros/src/CMakeLists.txt
 
 # Single files
+
+# Clion
+.idea/
+cmake-build-debug/

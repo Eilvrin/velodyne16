@@ -37,7 +37,7 @@ void Transform::processScansLast(const velodyne16_rawdata::VPointCloud::ConstPtr
   if ((pcl_conversions::fromPCL(pc->header.stamp) - start_time_).toSec() < WAIT_FOR_TF_AFTER_START_) return;
 
   pcl::PointCloud<pcl::PointXYZI>::Ptr outMsg(new pcl::PointCloud<pcl::PointXYZI>());
-  processScan(pc, 0, outMsg);
+  processScan(pc, outMsg);
   output_.publish(outMsg);
 }
 
@@ -48,30 +48,12 @@ void Transform::processScansStrongest(const velodyne16_rawdata::VPointCloud::Con
   if ((pcl_conversions::fromPCL(pc->header.stamp) - start_time_).toSec() < WAIT_FOR_TF_AFTER_START_) return;
 
   pcl::PointCloud<pcl::PointXYZI>::Ptr outMsg(new pcl::PointCloud<pcl::PointXYZI>());
-  processScan(pc, 1, outMsg);
+  processScan(pc, outMsg);
   output2_.publish(outMsg);
 }
 
-void Transform::processScan(const velodyne16_rawdata::VPointCloud::ConstPtr &pc, bool return_mode,
+void Transform::processScan(const velodyne16_rawdata::VPointCloud::ConstPtr &pc,
                             pcl::PointCloud<pcl::PointXYZI>::Ptr &outMsg) {
-  // Check sequence id of messages
-  int msg_seq = pc->header.seq;
-
-  if (return_mode == 0) {
-    if ((msg_seq - prev_msg_seq_last_) != 1 && prev_msg_seq_last_ != -1)
-      ROS_WARN("The sequence of last point clouds is not different by 1. prev_msg_seq: %i, msg_seq: %i",
-               prev_msg_seq_last_,
-               msg_seq);
-    prev_msg_seq_last_ = msg_seq;
-  }
-
-  if (return_mode == 1) {
-    if ((msg_seq - prev_msg_seq_strongest_) != 1 && prev_msg_seq_strongest_ != -1)
-      ROS_WARN("The sequence of strongest point clouds is not different by 1. prev_msg_seq: %i, msg_seq: %i",
-               prev_msg_seq_strongest_,
-               msg_seq);
-    prev_msg_seq_strongest_ = msg_seq;
-  }
 
   outMsg->header.stamp = pc->header.stamp;
   std::string frame_id = pc->header.frame_id;
@@ -86,7 +68,7 @@ void Transform::processScan(const velodyne16_rawdata::VPointCloud::ConstPtr &pc,
 
   if (pc->at(pc->width - 1, pc->height - 1).timestamp == -1.0) {
     ROS_ERROR_STREAM(
-        "The timestamp of the last poit in the point cloud is not set. Check that cloud_vlp16_node provides timestamps.");
+        "The timestamp of the last point in the point cloud is not set. Check that cloud_node provides timestamps.");
     return;
   }
 

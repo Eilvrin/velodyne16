@@ -35,9 +35,7 @@ class Transform {
 
   void processScansLast(const velodyne16_rawdata::VPointCloud::ConstPtr &pc);
   void processScansStrongest(const velodyne16_rawdata::VPointCloud::ConstPtr &pc);
-  // bool return_mode:
-  // 0 - Last return, 1 - Strongest return
-  void processScan(const velodyne16_rawdata::VPointCloud::ConstPtr &pc, bool return_mode,
+  void processScan(const velodyne16_rawdata::VPointCloud::ConstPtr &pc,
                    pcl::PointCloud<pcl::PointXYZI>::Ptr &outMsg);
 
   ros::Subscriber velodyne_points_last_;

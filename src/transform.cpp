@@ -83,17 +83,19 @@ void Transform::processScan(const velodyne16_rawdata::VPointCloud::ConstPtr &pc,
   nan_point.x = nan_point.y = nan_point.z = std::numeric_limits<float>::quiet_NaN();
   nan_point.intensity = 0u;
   outMsg->points.resize(outMsg->width * outMsg->height, nan_point);
-
-  if (pc->at(pc->width - 1, pc->height - 1).timestamp == -1.0) {
+  if (pc->at(pc->width - 1, 0).time_offset_ns == 0) {
     ROS_ERROR_STREAM(
-        "The timestamp of the last poit in the point cloud is not set. Check that cloud_vlp16_node provides timestamps.");
+        "The timestamp of the last point in the point cloud is not set. Check that cloud_vlp16_node provides timestamps.");
     return;
   }
 
-  ros::Time timestamp_end_point;
-  timestamp_end_point.fromSec(pc->at(pc->width - 1, pc->height - 1).timestamp);
+  ros::Time target_time;
+  target_time.fromNSec(pc->header.stamp * 1000ull);
 
-  ros::Time target_time = pcl_conversions::fromPCL(pc->header.stamp);
+  ros::Time timestamp_end_point;
+  ros::Duration offset_end_point;
+  offset_end_point.nsec = pc->at(pc->width - 1, 0).time_offset_ns;
+  timestamp_end_point = target_time + offset_end_point;
 
   try {
     listener_.waitForTransform(frame_id, target_time,
@@ -106,7 +108,9 @@ void Transform::processScan(const velodyne16_rawdata::VPointCloud::ConstPtr &pc,
   for (unsigned int i = 0; i < pc->points.size(); ++i) {
     if (!std::isnan(pc->points[i].x) || !std::isnan(pc->points[i].y) || !std::isnan(pc->points[i].z)) {
       ros::Time timestamp_t_point;
-      timestamp_t_point.fromSec(pc->points[i].timestamp);
+      ros::Duration offset_t_point;
+      offset_t_point.nsec = pc->points[i].time_offset_ns;
+      timestamp_t_point = target_time + offset_t_point;
 
       geometry_msgs::PointStamped t_point;
       t_point.header.frame_id = frame_id;

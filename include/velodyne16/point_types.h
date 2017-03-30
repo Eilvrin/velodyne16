@@ -26,18 +26,18 @@ namespace velodyne16 {
 /** Euclidean Velodyne coordinate, including timestamp, intensity and ring number. */
 struct PointXYZTI {
   PCL_ADD_POINT4D;                    // quad-word XYZ
-  double timestamp;                 ///< point timestamp
-  float intensity;                 ///< laser intensity reading
+  uint32_t time_offset_ns;            ///< point timestamp offset
+  float intensity;                    ///< laser intensity reading
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW     // ensure proper alignment
 } EIGEN_ALIGN16;
 
 }; // namespace velodyne16
 
 POINT_CLOUD_REGISTER_POINT_STRUCT(velodyne16::PointXYZTI,
-                                  (float, x, x)
+                                      (float, x, x)
                                       (float, y, y)
                                       (float, z, z)
-                                      (double, timestamp, timestamp)
+                                      (uint32_t, time_offset_ns, time_offset_ns)
                                       (float, intensity, intensity))
 
 #endif // __VELODYNE_POINTCLOUD_POINT_TYPES_H

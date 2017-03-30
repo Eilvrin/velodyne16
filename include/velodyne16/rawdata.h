@@ -143,6 +143,8 @@ class RawData {
 
   ros::Time timestamp_strongest_;
   ros::Time timestamp_last_;
+  uint32_t time_offset_last_;       // Variables to account for loss of precision when converting
+  uint32_t time_offset_strongest_;  // from ros timestamp header[ns] to pcl timestamp header[µs]
   std::string frame_id_;
 
   /**

@@ -124,17 +124,23 @@ void RawData::unpack_vlp16(const velodyne16::VelodynePacket::ConstPtr &packetMsg
 
   if (timestamp_last_.toSec() == 0.0) // Initialization at the start of the node
   {
-    timestamp_last_ = packetMsg->header.stamp;
     frame_id_ = packetMsg->header.frame_id;
+    timestamp_last_ = packetMsg->header.stamp;
+    // Calculate the amount of ns that will be lost during conversion to µs
+    time_offset_last_ = (uint32_t)(timestamp_last_.nsec%1000ull);
   }
 
   if (dual_return && timestamp_strongest_.toSec() == 0.0) // Initialization at the start of the node
+  {
     timestamp_strongest_ = packetMsg->header.stamp + ros::Duration((VLP16_BLOCK_TDURATION) * 1.0e-6);
+    // Calculate the amount of ns that will be lost during conversion to µs
+    time_offset_strongest_ = (uint32_t)(timestamp_strongest_.nsec%1000ull);
+  }
 
   VPoint nan_point;
   nan_point.x = nan_point.y = nan_point.z = std::numeric_limits<float>::quiet_NaN();
   nan_point.intensity = 0u;
-  nan_point.timestamp = -1.0;
+  nan_point.time_offset_ns = 0;
 
   // Process each block.
   for (int block = 0; block < BLOCKS_PER_PACKET; block++) {
@@ -188,8 +194,8 @@ void RawData::unpack_vlp16(const velodyne16::VelodynePacket::ConstPtr &packetMsg
         if (dual_return && (block % 2 != 0)) {
           if (azimuth_corrected_f < prev_azimuth_strongest_) {
             velodyne16_rawdata::VPointCloud::Ptr outMsgStrongest(new velodyne16_rawdata::VPointCloud());
-            // Convert ros time to pcl time.
-            outMsgStrongest->header.stamp = pcl_conversions::toPCL(timestamp_strongest_);
+            // Convert ros time [ns] to pcl time [µs]
+            outMsgStrongest->header.stamp = timestamp_strongest_.toNSec() / 1000ull;
             outMsgStrongest->header.frame_id = frame_id_;
 
             // Determine the max size of points
@@ -217,6 +223,8 @@ void RawData::unpack_vlp16(const velodyne16::VelodynePacket::ConstPtr &packetMsg
 
             timestamp_strongest_ =
                 packetMsg->header.stamp + ros::Duration((block * VLP16_BLOCK_TDURATION + t_beam) * 1.0e-6);
+            // Calculate the amount of ns that is lost during conversion to µs
+            time_offset_strongest_ = (uint32_t)(timestamp_strongest_.nsec%1000ull);
 
             points_strongest_.clear();
             points_strongest_.resize(VLP16_SCANS_PER_FIRING);
@@ -225,8 +233,8 @@ void RawData::unpack_vlp16(const velodyne16::VelodynePacket::ConstPtr &packetMsg
         } else {
           if (azimuth_corrected_f < prev_azimuth_last_) {
             velodyne16_rawdata::VPointCloud::Ptr outMsgLast(new velodyne16_rawdata::VPointCloud());
-            // Convert ros time to pcl time.
-            outMsgLast->header.stamp = pcl_conversions::toPCL(timestamp_last_);
+            // Convert ros time [ns] to pcl time [µs]
+            outMsgLast->header.stamp = timestamp_last_.toNSec() / 1000ull;
             outMsgLast->header.frame_id = frame_id_;
 
             // Determine the max size of points
@@ -253,6 +261,7 @@ void RawData::unpack_vlp16(const velodyne16::VelodynePacket::ConstPtr &packetMsg
 
             timestamp_last_ =
                 packetMsg->header.stamp + ros::Duration((block * VLP16_BLOCK_TDURATION + t_beam) * 1.0e-6);
+            time_offset_last_ = (uint32_t)(timestamp_last_.nsec%1000ull);
 
             points_last_.clear();
             points_last_.resize(VLP16_SCANS_PER_FIRING);
@@ -369,10 +378,14 @@ void RawData::unpack_vlp16(const velodyne16::VelodynePacket::ConstPtr &packetMsg
         VPoint point;
         point.x = point.y = point.z = std::numeric_limits<float>::quiet_NaN();
         point.intensity = 0u;
-        point.timestamp = -1.0;
+        point.time_offset_ns = 0;
         if (config_.cloud_with_stamp) {
-          point.timestamp =
-              (packetMsg->header.stamp + ros::Duration((block * VLP16_BLOCK_TDURATION + t_beam) * 1.0e-6)).toSec();
+          ros::Time point_timestamp = packetMsg->header.stamp + ros::Duration((block * VLP16_BLOCK_TDURATION + t_beam) * 1.0e-6);
+          if (dual_return && (block % 2 != 0)) {
+            point.time_offset_ns = (point_timestamp - timestamp_strongest_).nsec + time_offset_strongest_;
+          } else {
+            point.time_offset_ns = (point_timestamp - timestamp_last_).nsec + time_offset_last_;
+          }
         }
 
         // Compute the row index of the point.

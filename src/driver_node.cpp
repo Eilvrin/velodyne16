@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
   ros::NodeHandle private_nh("~");
 
   // start the driver
-  VelodyneDriver dvr(node, private_nh);
+  velodyne16::VelodyneDriver dvr(node, private_nh);
 
   // loop until shut down
   while (ros::ok() && dvr.publishPacket()) {

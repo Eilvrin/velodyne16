@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
   ros::NodeHandle priv_nh("~");
 
   // create conversion class, which subscribes to raw data
-  Convert conv(node, priv_nh);
+  velodyne16::Convert conv(node, priv_nh);
 
   // handle callbacks until shut down
   ros::spin();

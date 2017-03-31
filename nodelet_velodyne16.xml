@@ -1,0 +1,29 @@
+<library path="lib/libdriver_nodelet">
+  <class name="velodyne16/DriverNodelet"
+         type="velodyne16::DriverNodelet"
+         base_class_type="nodelet::Nodelet">
+    <description> 
+      Publish raw Velodyne data packets.
+    </description>
+  </class>
+</library>
+
+<library path="lib/libcloud_nodelet">
+  <class name="velodyne16/CloudNodelet"
+         type="velodyne16::CloudNodelet"
+         base_class_type="nodelet::Nodelet">
+    <description> 
+      Converts raw Velodyne 3D LIDAR packets to PointCloud2.
+    </description>
+  </class>
+</library>
+
+<library path="lib/libtransform_nodelet">
+  <class name="velodyne16/TransformNodelet"
+         type="velodyne16::TransformNodelet"
+         base_class_type="nodelet::Nodelet">
+    <description> 
+      Applies tf transforms to the Velodyne point clouds.
+    </description>
+  </class>
+</library>

@@ -10,6 +10,7 @@ find_package(catkin REQUIRED COMPONENTS
     pcl_ros
     pcl_conversions
     angles
+    nodelet
     )
 
 find_package(Boost COMPONENTS signals)
@@ -48,7 +49,7 @@ endif (NOT ${YAML_CPP_VERSION} VERSION_LESS "0.5")
 catkin_package(
     INCLUDE_DIRS include
     DEPENDS yaml-cpp python-yaml
-    CATKIN_DEPENDS roscpp dynamic_reconfigure message_runtime std_msgs tf pcl_ros angles
+    CATKIN_DEPENDS roscpp dynamic_reconfigure message_runtime std_msgs tf pcl_ros angles nodelet
     LIBRARIES velodyne16_lib
 )
 
@@ -65,10 +66,25 @@ target_link_libraries(driver_node ${catkin_LIBRARIES})
 target_link_libraries(cloud_node ${catkin_LIBRARIES} ${YAML_CPP_LIBRARIES})
 target_link_libraries(transform_node ${catkin_LIBRARIES})
 
+# Nodelet
+add_library(driver_nodelet src/driver_nodelet.cpp src/driver.cpp)
+add_dependencies(driver_nodelet velodyne16_gencfg)
+target_link_libraries(driver_nodelet ${catkin_LIBRARIES})
+
+add_library(cloud_nodelet src/cloud_nodelet.cpp src/calibration.cpp src/convert.cpp src/rawdata.cpp)
+add_dependencies(cloud_nodelet velodyne16_gencfg)
+target_link_libraries(cloud_nodelet ${catkin_LIBRARIES} ${YAML_CPP_LIBRARIES})
+
+add_library(transform_nodelet src/transform_nodelet.cpp src/transform.cpp)
+target_link_libraries(transform_nodelet ${catkin_LIBRARIES})
+
 # Installation
 
-install(TARGETS driver_node cloud_node transform_node
+install(TARGETS driver_node cloud_node transform_node driver_nodelet cloud_nodelet transform_nodelet
     ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
     )
+
+install(FILES nodelet_velodyne16.xml
+DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})

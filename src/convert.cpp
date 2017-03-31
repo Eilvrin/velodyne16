@@ -15,6 +15,9 @@
 
 #include "../include/velodyne16/convert.h"
 
+namespace velodyne16
+{
+
 /** @brief Constructor. */
 Convert::Convert(ros::NodeHandle node, ros::NodeHandle private_nh) :
     data_(new velodyne16_rawdata::RawData()) {
@@ -50,3 +53,5 @@ void Convert::callback(velodyne16::CloudNodeConfig &config,
 void Convert::processPackets(const velodyne16::VelodynePacket::ConstPtr &packetMsg) {
   data_->unpack_vlp16(packetMsg, output_, output2_);
 }
+
+} // namespace velodyne16

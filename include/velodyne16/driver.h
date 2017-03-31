@@ -35,6 +35,9 @@
 #include <velodyne16/DriverNodeConfig.h>
 #include <velodyne16/VelodynePacket.h>
 
+namespace velodyne16
+{
+
 class VelodyneDriver {
  public:
 
@@ -68,5 +71,7 @@ class VelodyneDriver {
   uint32_t previous_pkt_time;
 
 };
+
+} // namespace velodyne16
 
 #endif // _VELODYNE_DRIVER_H_

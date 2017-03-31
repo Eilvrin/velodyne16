@@ -25,6 +25,9 @@ static const double LOG_PERIOD_ = 1.0;
 /** Time to wait after startup of the node*/
 static const float WAIT_FOR_TF_AFTER_START_ = 3.0;
 
+namespace velodyne16
+{
+
 class Transform {
  public:
 
@@ -51,5 +54,7 @@ class Transform {
   int prev_msg_seq_last_;
 
 };
+
+} // namespace velodyne16
 
 #endif // _VELODYNE_POINTCLOUD_TRANSFORM_H_

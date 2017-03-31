@@ -15,6 +15,9 @@
 
 #include "../include/velodyne16/driver.h"
 
+namespace velodyne16
+{
+
 VelodyneDriver::VelodyneDriver(ros::NodeHandle node,
                                ros::NodeHandle private_nh) {
   // use private node handle to get parameters
@@ -207,3 +210,5 @@ uint32_t VelodyneDriver::getPacketTime(velodyne16::VelodynePacketPtr pkt) {
   std::memcpy(&timestamp, &pkt->data[1200], sizeof(uint32_t));
   return timestamp;
 }
+
+} // namespace velodyne16

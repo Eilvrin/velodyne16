@@ -12,6 +12,9 @@
 */
 #include "../include/velodyne16/transform.h"
 
+namespace velodyne16
+{
+
 /** @brief Constructor. */
 Transform::Transform(ros::NodeHandle node, ros::NodeHandle private_nh)
     : prev_msg_seq_strongest_(-1), prev_msg_seq_last_(-1) {
@@ -116,3 +119,5 @@ void Transform::processScan(const velodyne16_rawdata::VPointCloud::ConstPtr &pc,
     }
   }
 }
+
+} // namespace velodyne16

@@ -26,6 +26,9 @@
 #include "rawdata.h"
 #include <velodyne16/CloudNodeConfig.h>
 
+namespace velodyne16
+{
+
 class Convert {
  public:
 
@@ -47,5 +50,7 @@ class Convert {
   ros::Publisher output_;
   ros::Publisher output2_;
 };
+
+} // namespace velodyne16
 
 #endif // _VELODYNE_POINTCLOUD_CONVERT_H_

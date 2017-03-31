@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
   ros::NodeHandle priv_nh("~");
 
   // create conversion class, which subscribes to the point clouds
-  Transform trans(node, priv_nh);
+  velodyne16::Transform trans(node, priv_nh);
 
   // handle callbacks until shut down
   ros::spin();

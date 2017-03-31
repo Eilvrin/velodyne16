@@ -33,7 +33,6 @@ namespace velodyne16_rawdata {
 RawData::RawData()
     : timestamp_strongest_(0),
       timestamp_last_(0),
-      tf_listener_(NULL),
       prev_pkt_time_(0),
       prev_pkt_seq_(-1),
       prev_azimuth_strongest_(-1),
@@ -48,7 +47,7 @@ void RawData::setParameters(double min_range,
 }
 
 /** Set up for on-line operation. */
-int RawData::setup(ros::NodeHandle private_nh, tf::TransformListener *tf_listener) {
+int RawData::setup(ros::NodeHandle private_nh) {
   // whether or not to use timestamp
   private_nh.param("cloud_with_stamp", config_.cloud_with_stamp, false);
   // get path to angles.config file for this device
@@ -79,8 +78,6 @@ int RawData::setup(ros::NodeHandle private_nh, tf::TransformListener *tf_listene
     cos_rot_table_[rot_index] = cosf(rotation);
     sin_rot_table_[rot_index] = sinf(rotation);
   }
-
-  tf_listener_ = tf_listener;
 
   points_last_.resize(VLP16_SCANS_PER_FIRING);
   points_strongest_.resize(VLP16_SCANS_PER_FIRING);

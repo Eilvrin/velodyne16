@@ -29,7 +29,6 @@
 #include <ros/package.h>
 #include <ros/ros.h>
 #include <pcl_ros/point_cloud.h>
-#include <tf/transform_listener.h>
 
 // Package internal
 #include <velodyne16/VelodynePacket.h>
@@ -111,14 +110,12 @@ class RawData {
    *  begin:
    *
    *    - read device-specific angles calibration
-   *    - specify transform listener
    *
    *  @param private_nh private node handle for ROS parameters
-   *  @param tf_listener_ transform listener for transforming points
    *  @returns 0 if successful;
    *           errno value for failure
    */
-  int setup(ros::NodeHandle private_nh, tf::TransformListener *tf_listener = NULL);
+  int setup(ros::NodeHandle private_nh);
 
   void setParameters(double min_range, double max_range);
 
@@ -153,8 +150,6 @@ class RawData {
   velodyne16::Calibration calibration_;
   float sin_rot_table_[ROTATION_MAX_UNITS];
   float cos_rot_table_[ROTATION_MAX_UNITS];
-
-  tf::TransformListener *tf_listener_;
 
   std::ofstream file_;
 

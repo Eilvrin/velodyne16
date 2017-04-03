@@ -15,8 +15,7 @@
 
 #include "../include/velodyne16/convert.h"
 
-namespace velodyne16
-{
+namespace velodyne16 {
 
 /** @brief Constructor. */
 Convert::Convert(ros::NodeHandle node, ros::NodeHandle private_nh) :

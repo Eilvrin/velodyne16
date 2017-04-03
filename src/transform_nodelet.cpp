@@ -16,26 +16,23 @@
 
 #include "../include/velodyne16/transform.h"
 
-namespace velodyne16
-{
-  class TransformNodelet: public nodelet::Nodelet
-  {
-  public:
+namespace velodyne16 {
+class TransformNodelet : public nodelet::Nodelet {
+ public:
 
-    TransformNodelet() {}
-    ~TransformNodelet() {}
+  TransformNodelet() {}
+  virtual ~TransformNodelet() {}
 
-  private:
+ private:
 
-    virtual void onInit();
-    boost::shared_ptr<Transform> tf_;
-  };
+  virtual void onInit();
+  boost::shared_ptr<Transform> tf_;
+};
 
-  /** @brief Nodelet initialization. */
-  void TransformNodelet::onInit()
-  {
-    tf_.reset(new Transform(getNodeHandle(), getPrivateNodeHandle()));
-  }
+/** @brief Nodelet initialization. */
+void TransformNodelet::onInit() {
+  tf_.reset(new Transform(getNodeHandle(), getPrivateNodeHandle()));
+}
 
 } // namespace velodyne16
 

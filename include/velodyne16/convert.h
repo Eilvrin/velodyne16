@@ -26,8 +26,7 @@
 #include "rawdata.h"
 #include <velodyne16/CloudNodeConfig.h>
 
-namespace velodyne16
-{
+namespace velodyne16 {
 
 class Convert {
  public:

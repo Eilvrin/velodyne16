@@ -34,7 +34,7 @@ struct PointXYZTI {
 }; // namespace velodyne16
 
 POINT_CLOUD_REGISTER_POINT_STRUCT(velodyne16::PointXYZTI,
-                                      (float, x, x)
+                                  (float, x, x)
                                       (float, y, y)
                                       (float, z, z)
                                       (uint32_t, time_offset_ns, time_offset_ns)

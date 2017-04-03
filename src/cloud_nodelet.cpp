@@ -16,26 +16,23 @@
 
 #include "../include/velodyne16/convert.h"
 
-namespace velodyne16
-{
-  class CloudNodelet: public nodelet::Nodelet
-  {
-  public:
+namespace velodyne16 {
+class CloudNodelet : public nodelet::Nodelet {
+ public:
 
-    CloudNodelet() {}
-    ~CloudNodelet() {}
+  CloudNodelet() {}
+  virtual ~CloudNodelet() {}
 
-  private:
+ private:
 
-    virtual void onInit();
-    boost::shared_ptr<Convert> conv_;
-  };
+  virtual void onInit();
+  boost::shared_ptr<Convert> conv_;
+};
 
-  /** @brief Nodelet initialization. */
-  void CloudNodelet::onInit()
-  {
-    conv_.reset(new Convert(getNodeHandle(), getPrivateNodeHandle()));
-  }
+/** @brief Nodelet initialization. */
+void CloudNodelet::onInit() {
+  conv_.reset(new Convert(getNodeHandle(), getPrivateNodeHandle()));
+}
 
 } // namespace velodyne16
 

@@ -124,14 +124,14 @@ void RawData::unpack_vlp16(const velodyne16::VelodynePacket::ConstPtr &packetMsg
     frame_id_ = packetMsg->header.frame_id;
     timestamp_last_ = packetMsg->header.stamp;
     // Calculate the amount of ns that will be lost during conversion to µs
-    time_offset_last_ = (uint32_t)(timestamp_last_.nsec%1000ull);
+    time_offset_last_ = (uint32_t) (timestamp_last_.nsec % 1000ull);
   }
 
   if (dual_return && timestamp_strongest_.toSec() == 0.0) // Initialization at the start of the node
   {
     timestamp_strongest_ = packetMsg->header.stamp + ros::Duration((VLP16_BLOCK_TDURATION) * 1.0e-6);
     // Calculate the amount of ns that will be lost during conversion to µs
-    time_offset_strongest_ = (uint32_t)(timestamp_strongest_.nsec%1000ull);
+    time_offset_strongest_ = (uint32_t) (timestamp_strongest_.nsec % 1000ull);
   }
 
   VPoint nan_point;
@@ -198,8 +198,8 @@ void RawData::unpack_vlp16(const velodyne16::VelodynePacket::ConstPtr &packetMsg
             // Determine the max size of points
             unsigned long max_size = points_strongest_[0].size();
             for (unsigned int i = 1; i < points_strongest_.size(); i++)
-              max_size = std::max < unsigned
-            long > (points_strongest_[i].size(), max_size);
+              max_size = std::max<unsigned
+                                  long>(points_strongest_[i].size(), max_size);
 
             // Initialize the organized output point cloud.
             outMsgStrongest->width = max_size;
@@ -221,7 +221,7 @@ void RawData::unpack_vlp16(const velodyne16::VelodynePacket::ConstPtr &packetMsg
             timestamp_strongest_ =
                 packetMsg->header.stamp + ros::Duration((block * VLP16_BLOCK_TDURATION + t_beam) * 1.0e-6);
             // Calculate the amount of ns that is lost during conversion to µs
-            time_offset_strongest_ = (uint32_t)(timestamp_strongest_.nsec%1000ull);
+            time_offset_strongest_ = (uint32_t) (timestamp_strongest_.nsec % 1000ull);
 
             points_strongest_.clear();
             points_strongest_.resize(VLP16_SCANS_PER_FIRING);
@@ -258,7 +258,7 @@ void RawData::unpack_vlp16(const velodyne16::VelodynePacket::ConstPtr &packetMsg
 
             timestamp_last_ =
                 packetMsg->header.stamp + ros::Duration((block * VLP16_BLOCK_TDURATION + t_beam) * 1.0e-6);
-            time_offset_last_ = (uint32_t)(timestamp_last_.nsec%1000ull);
+            time_offset_last_ = (uint32_t) (timestamp_last_.nsec % 1000ull);
 
             points_last_.clear();
             points_last_.resize(VLP16_SCANS_PER_FIRING);
@@ -377,7 +377,8 @@ void RawData::unpack_vlp16(const velodyne16::VelodynePacket::ConstPtr &packetMsg
         point.intensity = 0u;
         point.time_offset_ns = 0;
         if (config_.cloud_with_stamp) {
-          ros::Time point_timestamp = packetMsg->header.stamp + ros::Duration((block * VLP16_BLOCK_TDURATION + t_beam) * 1.0e-6);
+          ros::Time point_timestamp =
+              packetMsg->header.stamp + ros::Duration((block * VLP16_BLOCK_TDURATION + t_beam) * 1.0e-6);
           if (dual_return && (block % 2 != 0)) {
             point.time_offset_ns = (point_timestamp - timestamp_strongest_).nsec + time_offset_strongest_;
           } else {

@@ -35,8 +35,7 @@
 #include <velodyne16/DriverNodeConfig.h>
 #include <velodyne16/VelodynePacket.h>
 
-namespace velodyne16
-{
+namespace velodyne16 {
 
 class VelodyneDriver {
  public:

@@ -12,8 +12,7 @@
 */
 #include "../include/velodyne16/transform.h"
 
-namespace velodyne16
-{
+namespace velodyne16 {
 
 /** @brief Constructor. */
 Transform::Transform(ros::NodeHandle node, ros::NodeHandle private_nh)
@@ -78,7 +77,7 @@ void Transform::processScan(const velodyne16_rawdata::VPointCloud::ConstPtr &pc,
   timestamp_end_point = target_time + offset_end_point;
 
   // Check, whether time offset is set
-  if (offset_end_point.nsec == 0) { 
+  if (offset_end_point.nsec == 0) {
     ROS_ERROR_STREAM(
         "The timestamp of the last point in the point cloud is not set. Check that cloud_node provides timestamps.");
     return;

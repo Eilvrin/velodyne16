@@ -20,29 +20,24 @@
 
 #include "../include/velodyne16/driver.h"
 
-namespace velodyne16
-{
+namespace velodyne16 {
 
-class DriverNodelet: public nodelet::Nodelet
-{
-public:
+class DriverNodelet : public nodelet::Nodelet {
+ public:
 
-  DriverNodelet():
-    running_(false)
-  {}
+  DriverNodelet() :
+      running_(false) {}
 
-  ~DriverNodelet()
-  {
-    if (running_)
-      {
-        NODELET_INFO("shutting down driver thread");
-        running_ = false;
-        deviceThread_->join();
-        NODELET_INFO("driver thread stopped");
-      }
+  virtual ~DriverNodelet() {
+    if (running_) {
+      NODELET_INFO("shutting down driver thread");
+      running_ = false;
+      deviceThread_->join();
+      NODELET_INFO("driver thread stopped");
+    }
   }
 
-private:
+ private:
 
   virtual void onInit(void);
   virtual void devicePoll(void);
@@ -53,25 +48,22 @@ private:
   boost::shared_ptr<VelodyneDriver> dvr_; ///< driver implementation class
 };
 
-void DriverNodelet::onInit()
-{
+void DriverNodelet::onInit() {
   // start the driver
   dvr_.reset(new VelodyneDriver(getNodeHandle(), getPrivateNodeHandle()));
   // spawn device poll thread
   running_ = true;
-  deviceThread_ = boost::shared_ptr< boost::thread >
-    (new boost::thread(boost::bind(&DriverNodelet::devicePoll, this)));
+  deviceThread_ = boost::shared_ptr<boost::thread>
+      (new boost::thread(boost::bind(&DriverNodelet::devicePoll, this)));
 }
 
 /** @brief Device poll thread main loop. */
-void DriverNodelet::devicePoll()
-{
-  while(ros::ok())
-    {
-      running_ = dvr_->publishPacket();
-      if (!running_)
-        break;
-    }
+void DriverNodelet::devicePoll() {
+  while (ros::ok()) {
+    running_ = dvr_->publishPacket();
+    if (!running_)
+      break;
+  }
   running_ = false;
 }
 

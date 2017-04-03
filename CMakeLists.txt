@@ -87,4 +87,4 @@ install(TARGETS driver_node cloud_node transform_node driver_nodelet cloud_nodel
     )
 
 install(FILES nodelet_velodyne16.xml
-DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})

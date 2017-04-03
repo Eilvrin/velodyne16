@@ -15,8 +15,7 @@
 
 #include "../include/velodyne16/driver.h"
 
-namespace velodyne16
-{
+namespace velodyne16 {
 
 VelodyneDriver::VelodyneDriver(ros::NodeHandle node,
                                ros::NodeHandle private_nh) {

@@ -21,12 +21,12 @@
 #ifdef HAVE_NEW_YAMLCPP
 namespace YAML {
 
-  // The >> operator disappeared in yaml-cpp 0.5, so this function is
-  // added to provide support for code written under the yaml-cpp 0.3 API.
-  template<typename T>
-  void operator >> (const YAML::Node& node, T& i) {
-    i = node.as<T>();
-  }
+// The >> operator disappeared in yaml-cpp 0.5, so this function is
+// added to provide support for code written under the yaml-cpp 0.3 API.
+template<typename T>
+void operator>>(const YAML::Node &node, T &i) {
+  i = node.as<T>();
+}
 } /* YAML */
 #endif // HAVE_NEW_YAMLCPP
 
@@ -62,10 +62,10 @@ void operator>>(const YAML::Node &node,
 #ifdef HAVE_NEW_YAMLCPP
   if (node[TWO_PT_CORRECTION_AVAILABLE])
     node[TWO_PT_CORRECTION_AVAILABLE] >>
-      correction.second.two_pt_correction_available;
+                                      correction.second.two_pt_correction_available;
 #else
-  if (const YAML::Node *pName = node.FindValue(TWO_PT_CORRECTION_AVAILABLE))
-    *pName >> correction.second.two_pt_correction_available;
+    if (const YAML::Node *pName = node.FindValue(TWO_PT_CORRECTION_AVAILABLE))
+      *pName >> correction.second.two_pt_correction_available;
 #endif
   else
     correction.second.two_pt_correction_available = false;
@@ -75,10 +75,10 @@ void operator>>(const YAML::Node &node,
 #ifdef HAVE_NEW_YAMLCPP
   if (node[HORIZ_OFFSET_CORRECTION])
     node[HORIZ_OFFSET_CORRECTION] >>
-      correction.second.horiz_offset_correction;
+                                  correction.second.horiz_offset_correction;
 #else
-  if (const YAML::Node *pName = node.FindValue(HORIZ_OFFSET_CORRECTION))
-    *pName >> correction.second.horiz_offset_correction;
+    if (const YAML::Node *pName = node.FindValue(HORIZ_OFFSET_CORRECTION))
+      *pName >> correction.second.horiz_offset_correction;
 #endif
   else
     correction.second.horiz_offset_correction = 0;

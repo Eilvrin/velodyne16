@@ -124,14 +124,14 @@ void RawData::unpack_vlp16(const velodyne16::VelodynePacket::ConstPtr &packetMsg
     frame_id_ = packetMsg->header.frame_id;
     timestamp_last_ = packetMsg->header.stamp;
     // Calculate the amount of ns that will be lost during conversion to µs
-    time_offset_last_ = (uint32_t) (timestamp_last_.nsec % 1000ull);
+    time_offset_last_ns_ = (uint32_t) (timestamp_last_.nsec % 1000ull);
   }
 
   if (dual_return && timestamp_strongest_.toSec() == 0.0) // Initialization at the start of the node
   {
-    timestamp_strongest_ = packetMsg->header.stamp + ros::Duration((VLP16_BLOCK_TDURATION) * 1.0e-6);
+    timestamp_strongest_ = packetMsg->header.stamp;
     // Calculate the amount of ns that will be lost during conversion to µs
-    time_offset_strongest_ = (uint32_t) (timestamp_strongest_.nsec % 1000ull);
+    time_offset_strongest_ns_ = (uint32_t) (timestamp_strongest_.nsec % 1000ull);
   }
 
   VPoint nan_point;
@@ -177,9 +177,12 @@ void RawData::unpack_vlp16(const velodyne16::VelodynePacket::ConstPtr &packetMsg
       azimuth_diff = last_azimuth_diff;
     }
 
+    // Important: In dual return mode, the timing of block 2n and 2n+1 is always identical, as strongest and last return are measured for the same firings.
+    int timing_block_num = (dual_return) ? static_cast<int>(block/2) : block;
+
     // Process each firing.
     for (int firing = 0, k = 0; firing < VLP16_FIRINGS_PER_BLOCK; firing++) {
-      for (int dsr = 0; dsr < VLP16_SCANS_PER_FIRING; dsr++, k += RAW_SCAN_SIZE) {
+      for (int dsr = 0; dsr < VLP16_SCANS_PER_FIRING; dsr++, k += RAW_SCAN_SIZE) { // beams
         // Time of beam firing w.r.t. beginning of block in [µs].
         float t_beam = dsr * VLP16_DSR_TOFFSET + firing * VLP16_FIRING_TOFFSET;
 
@@ -219,9 +222,9 @@ void RawData::unpack_vlp16(const velodyne16::VelodynePacket::ConstPtr &packetMsg
             frame_id_ = packetMsg->header.frame_id;
 
             timestamp_strongest_ =
-                packetMsg->header.stamp + ros::Duration((block * VLP16_BLOCK_TDURATION + t_beam) * 1.0e-6);
+                packetMsg->header.stamp + ros::Duration((timing_block_num * VLP16_BLOCK_TDURATION + t_beam) * 1.0e-6);
             // Calculate the amount of ns that is lost during conversion to µs
-            time_offset_strongest_ = (uint32_t) (timestamp_strongest_.nsec % 1000ull);
+            time_offset_strongest_ns_ = (uint32_t) (timestamp_strongest_.nsec % 1000ull);
 
             points_strongest_.clear();
             points_strongest_.resize(VLP16_SCANS_PER_FIRING);
@@ -231,8 +234,8 @@ void RawData::unpack_vlp16(const velodyne16::VelodynePacket::ConstPtr &packetMsg
           if (azimuth_corrected_f < prev_azimuth_last_) {
             velodyne16_rawdata::VPointCloud::Ptr outMsgLast(new velodyne16_rawdata::VPointCloud());
             // Convert ros time [ns] to pcl time [µs]
-            outMsgLast->header.stamp = timestamp_last_.toNSec() / 1000ull;
-            outMsgLast->header.frame_id = frame_id_;
+            outMsgLast->header.stamp = timestamp_last_.toNSec() / 1000ull; // here: PCL header in nsec
+            outMsgLast->header.frame_id = frame_id_; // here: PCL header
 
             // Determine the max size of points
             unsigned max_size = points_last_[0].size();
@@ -257,8 +260,8 @@ void RawData::unpack_vlp16(const velodyne16::VelodynePacket::ConstPtr &packetMsg
             frame_id_ = packetMsg->header.frame_id;
 
             timestamp_last_ =
-                packetMsg->header.stamp + ros::Duration((block * VLP16_BLOCK_TDURATION + t_beam) * 1.0e-6);
-            time_offset_last_ = (uint32_t) (timestamp_last_.nsec % 1000ull);
+                packetMsg->header.stamp + ros::Duration((timing_block_num * VLP16_BLOCK_TDURATION + t_beam) * 1.0e-6);
+            time_offset_last_ns_ = (uint32_t) (timestamp_last_.nsec % 1000ull);
 
             points_last_.clear();
             points_last_.resize(VLP16_SCANS_PER_FIRING);
@@ -377,12 +380,23 @@ void RawData::unpack_vlp16(const velodyne16::VelodynePacket::ConstPtr &packetMsg
         point.intensity = 0u;
         point.time_offset_ns = 0;
         if (config_.cloud_with_stamp) {
+
           ros::Time point_timestamp =
-              packetMsg->header.stamp + ros::Duration((block * VLP16_BLOCK_TDURATION + t_beam) * 1.0e-6);
+              packetMsg->header.stamp + ros::Duration((timing_block_num * VLP16_BLOCK_TDURATION + t_beam) * 1.0e-6);
+
           if (dual_return && (block % 2 != 0)) {
-            point.time_offset_ns = (point_timestamp - timestamp_strongest_).nsec + time_offset_strongest_;
+            if (point_timestamp.toNSec() >= timestamp_strongest_.toNSec()) { // Remark: This check shouldn't be required in theory. As the timestamp of each packet is set acoording to the receive time, the time stamp of the last point of a previous packet can be larger than the stamp of the first point of the current packet.
+              point.time_offset_ns = (point_timestamp - timestamp_strongest_).nsec
+                  + time_offset_strongest_ns_; // use .nsec instead of .toNSec(), because .nsec is uint32 and .toNSec() returns uint64
+            } else {
+              point.time_offset_ns = time_offset_strongest_ns_;
+            }
           } else {
-            point.time_offset_ns = (point_timestamp - timestamp_last_).nsec + time_offset_last_;
+            if (point_timestamp.toNSec() >= timestamp_last_.toNSec()) {
+              point.time_offset_ns = (point_timestamp - timestamp_last_).nsec + time_offset_last_ns_;
+            } else {
+              point.time_offset_ns = time_offset_last_ns_;
+            }
           }
         }
 

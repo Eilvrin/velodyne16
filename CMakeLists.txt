@@ -55,32 +55,32 @@ catkin_package(
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 
-add_executable(driver_node src/driver_node.cpp src/driver.cpp)
-add_executable(cloud_node src/cloud_node.cpp src/calibration.cpp src/convert.cpp src/rawdata.cpp)
-add_executable(transform_node src/transform_node.cpp src/transform.cpp)
+add_executable(driver_node16 src/driver_node.cpp src/driver.cpp)
+add_executable(cloud_node16 src/cloud_node.cpp src/calibration.cpp src/convert.cpp src/rawdata.cpp)
+add_executable(transform_node16 src/transform_node.cpp src/transform.cpp)
 
-add_dependencies(driver_node velodyne16_gencfg)
-add_dependencies(cloud_node velodyne16_gencfg)
+add_dependencies(driver_node16 velodyne16_gencfg velodyne16_generate_messages_cpp)
+add_dependencies(cloud_node16 velodyne16_gencfg velodyne16_generate_messages_cpp)
 
-target_link_libraries(driver_node ${catkin_LIBRARIES})
-target_link_libraries(cloud_node ${catkin_LIBRARIES} ${YAML_CPP_LIBRARIES})
-target_link_libraries(transform_node ${catkin_LIBRARIES})
+target_link_libraries(driver_node16 ${catkin_LIBRARIES})
+target_link_libraries(cloud_node16 ${catkin_LIBRARIES} ${YAML_CPP_LIBRARIES})
+target_link_libraries(transform_node16 ${catkin_LIBRARIES})
 
 # Nodelet
-add_library(driver_nodelet src/driver_nodelet.cpp src/driver.cpp)
-add_dependencies(driver_nodelet velodyne16_gencfg)
-target_link_libraries(driver_nodelet ${catkin_LIBRARIES})
+add_library(driver_nodelet16 src/driver_nodelet.cpp src/driver.cpp)
+add_dependencies(driver_nodelet16 velodyne16_gencfg)
+target_link_libraries(driver_nodelet16 ${catkin_LIBRARIES})
 
-add_library(cloud_nodelet src/cloud_nodelet.cpp src/calibration.cpp src/convert.cpp src/rawdata.cpp)
-add_dependencies(cloud_nodelet velodyne16_gencfg)
-target_link_libraries(cloud_nodelet ${catkin_LIBRARIES} ${YAML_CPP_LIBRARIES})
+add_library(cloud_nodelet16 src/cloud_nodelet.cpp src/calibration.cpp src/convert.cpp src/rawdata.cpp)
+add_dependencies(cloud_nodelet16 velodyne16_gencfg)
+target_link_libraries(cloud_nodelet16 ${catkin_LIBRARIES} ${YAML_CPP_LIBRARIES})
 
-add_library(transform_nodelet src/transform_nodelet.cpp src/transform.cpp)
-target_link_libraries(transform_nodelet ${catkin_LIBRARIES})
+add_library(transform_nodelet16 src/transform_nodelet.cpp src/transform.cpp)
+target_link_libraries(transform_nodelet16 ${catkin_LIBRARIES})
 
 # Installation
 
-install(TARGETS driver_node cloud_node transform_node driver_nodelet cloud_nodelet transform_nodelet
+install(TARGETS driver_node16 cloud_node16 transform_node16 driver_nodelet16 cloud_nodelet16 transform_nodelet16
     ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

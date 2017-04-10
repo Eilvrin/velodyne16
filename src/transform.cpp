@@ -33,7 +33,7 @@ Transform::Transform(ros::NodeHandle node, ros::NodeHandle private_nh)
 }
 
 /** @brief Callback for messages. */
-void Transform::processScansLast(const velodyne16_rawdata::VPointCloud::ConstPtr &pc) {
+void Transform::processScansLast(const velodyne16::VPointCloud::ConstPtr &pc) {
   // Discard messages received in the first seconds after startup, as tf might not be available
   static ros::Time start_time_ = ros::Time::now();
   if ((pcl_conversions::fromPCL(pc->header.stamp) - start_time_).toSec() < WAIT_FOR_TF_AFTER_START_) return;
@@ -44,7 +44,7 @@ void Transform::processScansLast(const velodyne16_rawdata::VPointCloud::ConstPtr
 }
 
 /** @brief Callback for messages. */
-void Transform::processScansStrongest(const velodyne16_rawdata::VPointCloud::ConstPtr &pc) {
+void Transform::processScansStrongest(const velodyne16::VPointCloud::ConstPtr &pc) {
   // Discard messages received in the first seconds after startup, as tf might not be available
   static ros::Time start_time_ = ros::Time::now();
   if ((pcl_conversions::fromPCL(pc->header.stamp) - start_time_).toSec() < WAIT_FOR_TF_AFTER_START_) return;
@@ -54,7 +54,7 @@ void Transform::processScansStrongest(const velodyne16_rawdata::VPointCloud::Con
   output2_.publish(outMsg);
 }
 
-void Transform::processScan(const velodyne16_rawdata::VPointCloud::ConstPtr &pc,
+void Transform::processScan(const velodyne16::VPointCloud::ConstPtr &pc,
                             pcl::PointCloud<pcl::PointXYZI>::Ptr &outMsg) {
 
   outMsg->header.stamp = pc->header.stamp;

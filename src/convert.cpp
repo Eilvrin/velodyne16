@@ -19,7 +19,7 @@ namespace velodyne16 {
 
 /** @brief Constructor. */
 Convert::Convert(ros::NodeHandle node, ros::NodeHandle private_nh) :
-    data_(new velodyne16_rawdata::RawData()) {
+    data_(new velodyne16::RawData()) {
   data_->setup(private_nh);
 
   // advertise output point cloud (before subscribing to input data)

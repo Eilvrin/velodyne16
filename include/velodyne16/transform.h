@@ -18,7 +18,7 @@
 #include <sensor_msgs/PointCloud2.h>
 #include <tf/transform_listener.h>
 
-#include "rawdata.h"
+#include "point_types.h"
 
 /** Log rate for throttled warnings and errors in seconds */
 static const double LOG_PERIOD_ = 1.0;
@@ -35,9 +35,9 @@ class Transform {
 
  private:
 
-  void processScansLast(const velodyne16_rawdata::VPointCloud::ConstPtr &pc);
-  void processScansStrongest(const velodyne16_rawdata::VPointCloud::ConstPtr &pc);
-  void processScan(const velodyne16_rawdata::VPointCloud::ConstPtr &pc,
+  void processScansLast(const velodyne16::VPointCloud::ConstPtr &pc);
+  void processScansStrongest(const velodyne16::VPointCloud::ConstPtr &pc);
+  void processScan(const velodyne16::VPointCloud::ConstPtr &pc,
                    pcl::PointCloud<pcl::PointXYZI>::Ptr &outMsg);
 
   ros::Subscriber velodyne_points_last_;

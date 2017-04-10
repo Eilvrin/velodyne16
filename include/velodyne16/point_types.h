@@ -20,6 +20,7 @@
 #ifndef __VELODYNE_POINTCLOUD_POINT_TYPES_H
 #define __VELODYNE_POINTCLOUD_POINT_TYPES_H
 
+#include <pcl_ros/point_cloud.h>
 #include <pcl/point_types.h>
 
 namespace velodyne16 {
@@ -30,6 +31,9 @@ struct PointXYZTI {
   float intensity;                    ///< laser intensity reading
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW     // ensure proper alignment
 } EIGEN_ALIGN16;
+
+typedef PointXYZTI VPoint;
+typedef pcl::PointCloud<VPoint> VPointCloud;
 
 }; // namespace velodyne16
 

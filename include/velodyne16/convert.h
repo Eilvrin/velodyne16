@@ -44,7 +44,7 @@ class Convert {
   boost::shared_ptr<dynamic_reconfigure::Server<velodyne16::
                                                 CloudNodeConfig> > srv_;
 
-  boost::shared_ptr<velodyne16_rawdata::RawData> data_;
+  boost::shared_ptr<velodyne16::RawData> data_;
   ros::Subscriber velodyne_packet_;
   ros::Publisher output_;
   ros::Publisher output2_;

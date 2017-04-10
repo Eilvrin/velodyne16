@@ -23,7 +23,7 @@
 
 #include "../include/velodyne16/rawdata.h"
 
-namespace velodyne16_rawdata {
+namespace velodyne16 {
 ////////////////////////////////////////////////////////////////////////
 //
 // RawData base class implementation
@@ -193,7 +193,7 @@ void RawData::unpack_vlp16(const velodyne16::VelodynePacket::ConstPtr &packetMsg
         // Publish if we received the whole scan
         if (dual_return && (block % 2 != 0)) {
           if (azimuth_corrected_f < prev_azimuth_strongest_) {
-            velodyne16_rawdata::VPointCloud::Ptr outMsgStrongest(new velodyne16_rawdata::VPointCloud());
+            velodyne16::VPointCloud::Ptr outMsgStrongest(new velodyne16::VPointCloud());
             // Convert ros time [ns] to pcl time [µs]
             outMsgStrongest->header.stamp = timestamp_strongest_.toNSec() / 1000ull;
             outMsgStrongest->header.frame_id = frame_id_;
@@ -232,7 +232,7 @@ void RawData::unpack_vlp16(const velodyne16::VelodynePacket::ConstPtr &packetMsg
           prev_azimuth_strongest_ = azimuth_corrected_f;
         } else {
           if (azimuth_corrected_f < prev_azimuth_last_) {
-            velodyne16_rawdata::VPointCloud::Ptr outMsgLast(new velodyne16_rawdata::VPointCloud());
+            velodyne16::VPointCloud::Ptr outMsgLast(new velodyne16::VPointCloud());
             // Convert ros time [ns] to pcl time [µs]
             outMsgLast->header.stamp = timestamp_last_.toNSec() / 1000ull; // here: PCL header in nsec
             outMsgLast->header.frame_id = frame_id_; // here: PCL header

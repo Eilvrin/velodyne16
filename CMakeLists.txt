@@ -48,7 +48,7 @@ endif (NOT ${YAML_CPP_VERSION} VERSION_LESS "0.5")
 
 catkin_package(
     INCLUDE_DIRS include
-    DEPENDS yaml-cpp python-yaml
+    DEPENDS
     CATKIN_DEPENDS roscpp dynamic_reconfigure message_runtime std_msgs tf pcl_ros angles nodelet
     LIBRARIES velodyne16_lib
 )
@@ -69,7 +69,7 @@ target_link_libraries(transform_node16 ${catkin_LIBRARIES})
 # Nodelet
 add_library(driver_nodelet16 src/driver_nodelet.cpp src/driver.cpp)
 add_dependencies(driver_nodelet16 velodyne16_generate_messages_cpp velodyne16_gencfg)
-target_link_libraries(driver_nodelet ${catkin_LIBRARIES})
+target_link_libraries(driver_nodelet16 ${catkin_LIBRARIES})
 
 add_library(cloud_nodelet16 src/cloud_nodelet.cpp src/calibration.cpp src/convert.cpp src/rawdata.cpp)
 add_dependencies(cloud_nodelet16 velodyne16_generate_messages_cpp velodyne16_gencfg)

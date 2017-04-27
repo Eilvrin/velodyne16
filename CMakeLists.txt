@@ -59,8 +59,8 @@ add_executable(driver_node src/driver_node.cpp src/driver.cpp)
 add_executable(cloud_node src/cloud_node.cpp src/calibration.cpp src/convert.cpp src/rawdata.cpp)
 add_executable(transform_node src/transform_node.cpp src/transform.cpp)
 
-add_dependencies(driver_node velodyne16_gencfg)
-add_dependencies(cloud_node velodyne16_gencfg)
+add_dependencies(driver_node velodyne16_generate_messages_cpp velodyne16_gencfg)
+add_dependencies(cloud_node velodyne16_generate_messages_cpp velodyne16_gencfg)
 
 target_link_libraries(driver_node ${catkin_LIBRARIES})
 target_link_libraries(cloud_node ${catkin_LIBRARIES} ${YAML_CPP_LIBRARIES})
@@ -68,11 +68,11 @@ target_link_libraries(transform_node ${catkin_LIBRARIES})
 
 # Nodelet
 add_library(driver_nodelet src/driver_nodelet.cpp src/driver.cpp)
-add_dependencies(driver_nodelet velodyne16_gencfg)
+add_dependencies(driver_nodelet velodyne16_generate_messages_cpp velodyne16_gencfg)
 target_link_libraries(driver_nodelet ${catkin_LIBRARIES})
 
 add_library(cloud_nodelet src/cloud_nodelet.cpp src/calibration.cpp src/convert.cpp src/rawdata.cpp)
-add_dependencies(cloud_nodelet velodyne16_gencfg)
+add_dependencies(cloud_nodelet velodyne16_generate_messages_cpp velodyne16_gencfg)
 target_link_libraries(cloud_nodelet ${catkin_LIBRARIES} ${YAML_CPP_LIBRARIES})
 
 add_library(transform_nodelet src/transform_nodelet.cpp src/transform.cpp)

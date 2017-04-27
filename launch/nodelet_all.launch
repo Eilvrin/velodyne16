@@ -5,16 +5,16 @@
     <!-- start nodelet manager and load driver nodelet -->
     <node pkg="nodelet" type="nodelet" name="velodyne16_nodelet_manager"
           args="manager" output="screen"/>
-    <node pkg="nodelet" type="nodelet" name="driver_nodelet"
+    <node pkg="nodelet" type="nodelet" name="driver_nodelet16"
           args="load velodyne16/DriverNodelet velodyne16_nodelet_manager">
         <rosparam file="$(find velodyne16)/config/driver_node.yaml" command="load"/>
     </node>
-    <node pkg="nodelet" type="nodelet" name="cloud_nodelet"
+    <node pkg="nodelet" type="nodelet" name="cloud_nodelet16"
           args="load velodyne16/CloudNodelet velodyne16_nodelet_manager">
         <rosparam param="calibration" subst_value="true">$(find velodyne16)/config/calibration.yaml</rosparam>
         <rosparam file="$(find velodyne16)/config/cloud_node.yaml" command="load"/>
     </node>
-    <node pkg="nodelet" type="nodelet" name="transform_nodelet"
+    <node pkg="nodelet" type="nodelet" name="transform_nodelet16"
           args="load velodyne16/TransformNodelet velodyne16_nodelet_manager">
         <rosparam file="$(find velodyne16)/config/transform_node.yaml" command="load"/>
     </node>

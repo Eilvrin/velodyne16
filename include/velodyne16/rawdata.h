@@ -35,10 +35,8 @@
 #include "calibration.h"
 #include "point_types.h"
 
-namespace velodyne16_rawdata {
-// Shorthand typedefs for point cloud representations
-typedef velodyne16::PointXYZTI VPoint;
-typedef pcl::PointCloud<VPoint> VPointCloud;
+namespace velodyne16 {
+
 
 /** Log rate for throttled warnings and errors in seconds */
 static const double LOG_PERIOD_ = 1.0;

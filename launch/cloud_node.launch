@@ -3,7 +3,7 @@
 <launch>
 
     # Publish Velodyne lidar scans
-    <node name="cloud_node" pkg="velodyne16" type="cloud_node"
+    <node name="cloud_node16" pkg="velodyne16" type="cloud_node16"
           required="true" output="screen">
         <rosparam param="calibration" subst_value="true">$(find velodyne16)/config/calibration.yaml</rosparam>
         <rosparam file="$(find velodyne16)/config/cloud_node.yaml" command="load"/>

@@ -49,7 +49,7 @@ void RawData::setParameters(double min_range,
 /** Set up for on-line operation. */
 int RawData::setup(ros::NodeHandle private_nh) {
   // whether or not to use timestamp
-  private_nh.param("cloud_with_stamp", config_.cloud_with_stamp, false);
+  private_nh.param("cloud_with_timestamp", config_.cloud_with_timestamp, false);
   // get path to angles.config file for this device
   if (!private_nh.getParam("calibration", config_.calibrationFile)) {
     ROS_ERROR_STREAM("No calibration angles specified! Using test values!");
@@ -379,7 +379,7 @@ void RawData::unpack_vlp16(const velodyne16::VelodynePacket::ConstPtr &packetMsg
         point.x = point.y = point.z = std::numeric_limits<float>::quiet_NaN();
         point.intensity = 0u;
         point.time_offset_ns = 0;
-        if (config_.cloud_with_stamp) {
+        if (config_.cloud_with_timestamp) {
 
           ros::Time point_timestamp =
               packetMsg->header.stamp + ros::Duration((timing_block_num * VLP16_BLOCK_TDURATION + t_beam) * 1.0e-6);

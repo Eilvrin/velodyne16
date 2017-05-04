@@ -132,7 +132,7 @@ class RawData {
     std::string calibrationFile;     ///< calibration file name
     double max_range;                ///< maximum range to publish
     double min_range;                ///< minimum range to publish
-    bool cloud_with_stamp;           ///< Whether or not publish each point with the timestamp
+    bool cloud_with_timestamp;           ///< Whether or not publish each point with the timestamp
   } Config;
   Config config_;
 

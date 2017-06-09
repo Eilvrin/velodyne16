@@ -50,7 +50,7 @@ catkin_package(
     INCLUDE_DIRS include
     DEPENDS
     CATKIN_DEPENDS roscpp dynamic_reconfigure message_runtime std_msgs tf pcl_ros angles nodelet
-    LIBRARIES velodyne16_lib
+#    LIBRARIES velodyne16_lib
 )
 
 include_directories(include ${catkin_INCLUDE_DIRS})

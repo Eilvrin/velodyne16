@@ -72,5 +72,4 @@ void DriverNodelet::devicePoll() {
 // Register this plugin with pluginlib
 //
 // parameters are: package, class name, class type, base class type
-PLUGINLIB_DECLARE_CLASS(velodyne16, DriverNodelet,
-                        velodyne16::DriverNodelet, nodelet::Nodelet);
+PLUGINLIB_EXPORT_CLASS(velodyne16::DriverNodelet, nodelet::Nodelet)

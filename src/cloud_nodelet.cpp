@@ -40,5 +40,4 @@ void CloudNodelet::onInit() {
 // Register this plugin with pluginlib.
 //
 // parameters: package, class name, class type, base class type
-PLUGINLIB_DECLARE_CLASS(velodyne16, CloudNodelet,
-                        velodyne16::CloudNodelet, nodelet::Nodelet);
+PLUGINLIB_EXPORT_CLASS(velodyne16::CloudNodelet, nodelet::Nodelet)
